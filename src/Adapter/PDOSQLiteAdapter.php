@@ -78,6 +78,7 @@
             $affectedRows = 0;
             try
             {
+
                 $stmt = $this->dbh->prepare($query);
                 $totalParams = count($params);
                 if ($totalParams > 0) {
@@ -89,21 +90,21 @@
                                 $stmt->bindValue($params[$i]->getName(), null, \PDO::PARAM_NULL);
                             break;
                             case "aportela\DatabaseWrapper\Param\BooleanParam":
-                                $stmt->bindValue($params[$i]->getName(), $params[$i]->value, \PDO::PARAM_BOOL);
+                                $stmt->bindValue($params[$i]->getName(), $params[$i]->getValue(), \PDO::PARAM_BOOL);
                             break;
                             case "aportela\DatabaseWrapper\Param\IntegerParam":
-                                $stmt->bindValue($params[$i]->getName(), $params[$i]->value, \PDO::PARAM_INT);
+                                $stmt->bindValue($params[$i]->getName(), $params[$i]->getValue(), \PDO::PARAM_INT);
                             break;
                             case "aportela\DatabaseWrapper\Param\FloatParam":
-                                $stmt->bindValue($params[$i]->getName(), $params[$i]->value, \PDO::PARAM_STR);
+                                $stmt->bindValue($params[$i]->getName(), $params[$i]->getValue(), \PDO::PARAM_STR);
                             break;
                             case "aportela\DatabaseWrapper\Param\StringParam":
-                                $stmt->bindValue($params[$i]->getName(), $params[$i]->value, \PDO::PARAM_STR);
+                                $stmt->bindValue($params[$i]->getName(), $params[$i]->getValue(), \PDO::PARAM_STR);
                             break;
                         }
                     }
                 }
-                $affectedRows = $stmt->exec();
+                $affectedRows = $stmt->execute();
             }
             catch (\PDOException $e)
             {
@@ -128,16 +129,16 @@
                                 $stmt->bindValue($params[$i]->getName(), null, \PDO::PARAM_NULL);
                             break;
                             case "aportela\DatabaseWrapper\Param\BooleanParam":
-                                $stmt->bindValue($params[$i]->getName(), $params[$i]->value, \PDO::PARAM_BOOL);
+                                $stmt->bindValue($params[$i]->getName(), $params[$i]->getValue(), \PDO::PARAM_BOOL);
                             break;
                             case "aportela\DatabaseWrapper\Param\IntegerParam":
-                                $stmt->bindValue($params[$i]->getName(), $params[$i]->value, \PDO::PARAM_INT);
+                                $stmt->bindValue($params[$i]->getName(), $params[$i]->getValue(), \PDO::PARAM_INT);
                             break;
                             case "aportela\DatabaseWrapper\Param\FloatParam":
-                                $stmt->bindValue($params[$i]->getName(), $params[$i]->value, \PDO::PARAM_STR);
+                                $stmt->bindValue($params[$i]->getName(), $params[$i]->getValue(), \PDO::PARAM_STR);
                             break;
                             case "aportela\DatabaseWrapper\Param\StringParam":
-                                $stmt->bindValue($params[$i]->getName(), $params[$i]->value, \PDO::PARAM_STR);
+                                $stmt->bindValue($params[$i]->getName(), $params[$i]->getValue(), \PDO::PARAM_STR);
                             break;
                         }
                     }
