@@ -6,7 +6,7 @@
     {
         protected $name;
 
-        public function __construct(string $name, $value)
+        public function __construct(string $name, $value = null)
         {
             $this->name = $name;
         }
