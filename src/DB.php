@@ -7,7 +7,7 @@
         protected $adapter;
         protected $logger;
 
-        public function __construct(Adapter\InterfaceAdapter $adapter, \Monolog\Logger $logger)
+        public function __construct(Adapter\InterfaceAdapter $adapter, \Psr\Log\LoggerInterface $logger)
         {
             $this->adapter = $adapter;
             $this->logger = $logger;
