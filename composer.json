@@ -1,0 +1,20 @@
+{
+    "name": "aportela/db-wrapper",
+    "description": "Custom database wrapper",
+    "type": "library",
+    "license": "GPL-3.0-only",
+    "authors": [
+        {
+            "name": "alex",
+            "email": "766f6964+github@gmail.com"
+        }
+    ],
+    "require": {
+        "monolog/monolog": "^1.25"
+    },
+    "autoload": {
+        "psr-4": {
+            "aportela\\DatabaseWrapper\\": "src"
+        }
+    }
+}
