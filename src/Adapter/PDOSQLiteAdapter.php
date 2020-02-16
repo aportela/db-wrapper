@@ -5,6 +5,7 @@
     class PDOSQLiteAdapter implements InterfaceAdapter
     {
         protected $dbh;
+        public $schema;
 
         public function __construct(string $databasePath)
         {
@@ -19,6 +20,7 @@
                         \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
                     )
                 );
+                $this->schema = new \aportela\DatabaseWrapper\Schema\PDOSQLiteSchema();
             }
             catch (\PDOException $e)
             {
@@ -160,4 +162,5 @@
 			return($rows);
         }
     }
+
 ?>
