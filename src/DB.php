@@ -102,6 +102,109 @@
             return($rows);
         }
 
+        public function installSchema(): bool
+        {
+            $this->logger->info("DatabaseWrapper::installSchema");
+            if ($this->beginTransaction())
+            {
+                $installed = false;
+                try
+                {
+                    foreach($this->adapter->schema::getInstallQueries() as $query)
+                    {
+                        $this->exec($query);
+                    }
+                    $installed = true;
+                }
+                catch (\aportela\DatabaseWrapper\Exception\DBException $e)
+                {
+                }
+                finally
+                {
+                    if ($installed)
+                    {
+                        $this->commit();
+                        $this->logger->info("DatabaseWrapper::installSchema SUCCESS");
+                    }
+                    else
+                    {
+                        $this->rollback();
+                        $this->logger->emergency("DatabaseWrapper::installSchema FAILED");
+                    }
+                }
+                return($installed);
+            }
+            else
+            {
+                $this->logger->emergency("DatabaseWrapper::installSchema FAILED (ERROR OPENING TRANSACTION)");
+                return(false);
+            }
+        }
+
+        public function upgradeSchema(): int
+        {
+            $this->logger->info("DatabaseWrapper::upgradeSchema");
+            $results = $this->query($this->adapter->schema::getLastVersionQuery());
+            if (count($results) == 1)
+            {
+                if ($this->beginTransaction())
+                {
+                    $success = false;
+                    $currentVersion = $results[0]->release_number;
+                    try
+                    {
+                        foreach($this->adapter->schema::getUpgradeQueries() as $version => $queries)
+                        {
+                            if ($version > $currentVersion)
+                            {
+                                foreach($queries as $query)
+                                {
+                                    $this->exec($query);
+                                }
+                                $this->exec(
+                                    $this->adapter->schema::getSetVersionQuery(),
+                                    array
+                                    (
+                                        new \aportela\DatabaseWrapper\Param\IntegerParam(":release_number", $version)
+                                    )
+                                );
+                                $currentVersion = $version;
+                                $this->logger->info("DatabaseWrapper::upgradeSchema version upgraded to " . $currentVersion);
+                            }
+                        }
+                        $success = true;
+                    }
+                    catch (\aportela\DatabaseWrapper\Exception\DBException $e)
+                    {
+                        throw $e;
+                    }
+                    finally
+                    {
+                        if ($success)
+                        {
+                            $this->commit();
+                            $this->logger->info("DatabaseWrapper::upgradeSchema SUCCESS");
+                        }
+                        else
+                        {
+                            $this->rollback();
+                            $this->logger->emergency("DatabaseWrapper::upgradeSchema FAILED");
+                        }
+                    }
+                    return($currentVersion);
+                }
+                else
+                {
+                    $this->logger->emergency("DatabaseWrapper::upgradeSchema FAILED (ERROR OPENING TRANSACTION)");
+                    return(-1);
+                }
+            }
+            else
+            {
+                $this->logger->emergency("DatabaseWrapper::upgradeSchema FAILED (NO PREVIOUS VERSION FOUND)");
+                return(-1);
+            }
+        }
     }
 
 ?>
