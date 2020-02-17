@@ -110,7 +110,7 @@
                 $installed = false;
                 try
                 {
-                    foreach($this->adapter->schema::getInstallQueries() as $query)
+                    foreach($this->adapter->schema->getInstallQueries() as $query)
                     {
                         $this->exec($query);
                     }
@@ -144,7 +144,7 @@
         public function upgradeSchema(): int
         {
             $this->logger->info("DatabaseWrapper::upgradeSchema");
-            $results = $this->query($this->adapter->schema::getLastVersionQuery());
+            $results = $this->query($this->adapter->schema->getLastVersionQuery());
             if (count($results) == 1)
             {
                 if ($this->beginTransaction())
@@ -153,7 +153,7 @@
                     $currentVersion = $results[0]->release_number;
                     try
                     {
-                        foreach($this->adapter->schema::getUpgradeQueries() as $version => $queries)
+                        foreach($this->adapter->schema->getUpgradeQueries() as $version => $queries)
                         {
                             if ($version > $currentVersion)
                             {
@@ -162,7 +162,7 @@
                                     $this->exec($query);
                                 }
                                 $this->exec(
-                                    $this->adapter->schema::getSetVersionQuery(),
+                                    $this->adapter->schema->getSetVersionQuery(),
                                     array
                                     (
                                         new \aportela\DatabaseWrapper\Param\IntegerParam(":release_number", $version)
