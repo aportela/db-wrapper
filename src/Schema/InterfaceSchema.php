@@ -4,13 +4,15 @@
 
     interface InterfaceSchema
     {
-        public static function getInstallQueries(): array;
+        public function __construct(string $upgradeSchemaPath = "");
 
-        public static function getSetVersionQuery(): string;
+        public function getInstallQueries(): array;
 
-        public static function getLastVersionQuery(): string;
+        public function getSetVersionQuery(): string;
 
-        public static function getUpgradeQueries(): array;
+        public function getLastVersionQuery(): string;
+
+        public function getUpgradeQueries(): array;
     }
 
 ?>

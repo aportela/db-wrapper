@@ -4,6 +4,8 @@
 
     class PDOSQLiteSchema implements InterfaceSchema
     {
+        protected $upgradeSchemaPath;
+
         private const INSTALL_QUERIES = array
         (
             '
@@ -31,49 +33,43 @@
             SELECT release_number FROM "VERSION" ORDER BY release_number DESC LIMIT 1;
         ';
 
-        private const UPGRADE_QUERIES = array
-        (
-            /*
-            // UPGRADE QUERIES EXAMPLE: (REPLACE BY YOUR OWN QUERIES)
-            1 => array
-            (
-                '
-                    CREATE TABLE "xxx" ...
-                ',
-                '
-                    INSERT INTO "xxx" ...
-                '
-            ),
-            2 => array
-            (
-                '
-                    CREATE TABLE "yyy" ...
-                ',
-                '
-                    INSERT INTO "yyy" ...
-                '
-            )
-            */
-        );
+        public function __construct(string $upgradeSchemaPath = "")
+        {
+            $this->upgradeSchemaPath = $upgradeSchemaPath;
+        }
 
-        public static function getInstallQueries(): array
+        public function getInstallQueries(): array
         {
             return(self::INSTALL_QUERIES);
         }
 
-        public static function getSetVersionQuery(): string
+        public function getSetVersionQuery(): string
         {
             return(self::SET_CURRENT_VERSION_QUERY);
         }
 
-        public static function getLastVersionQuery(): string
+        public function getLastVersionQuery(): string
         {
             return(self::GET_CURRENT_VERSION_QUERY);
         }
 
-        public static function getUpgradeQueries(): array
+        public function getUpgradeQueries(): array
         {
-            return(self::UPGRADE_QUERIES);
+            if (! empty($this->upgradeSchemaPath))
+            {
+                if (file_exists($this->upgradeSchemaPath))
+                {
+                    return(include $this->upgradeSchemaPath);
+                }
+                else
+                {
+                    throw new \Exception("Upgrade database schema file not found at " . $this->upgradeSchemaPath);
+                }
+            }
+            else
+            {
+                return(array());
+            }
         }
     }
 
