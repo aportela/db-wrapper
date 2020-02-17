@@ -7,7 +7,7 @@
         protected $dbh;
         public $schema;
 
-        public function __construct(string $databasePath)
+        public function __construct(string $databasePath, string $upgradeSchemaPath = "")
         {
             try
             {
@@ -20,7 +20,7 @@
                         \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
                     )
                 );
-                $this->schema = new \aportela\DatabaseWrapper\Schema\PDOSQLiteSchema();
+                $this->schema = new \aportela\DatabaseWrapper\Schema\PDOSQLiteSchema($upgradeSchemaPath);
             }
             catch (\PDOException $e)
             {
