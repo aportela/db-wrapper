@@ -102,6 +102,21 @@
             return($rows);
         }
 
+        public function isSchemaInstalled(): bool
+        {
+            $this->logger->info("DatabaseWrapper::isSchemaInstalled");
+            $installed = false;
+            try
+            {
+                $results = $this->query(" SELECT COUNT(name) AS table_count FROM sqlite_master WHERE type='table' AND name='VERSION'; ");
+                $installed = is_array($results) && count($results) == 1 && $results[0]->table_count == 1;                
+            }
+            catch (\aportela\DatabaseWrapper\Exception\DBException $e)
+            {
+            }
+            return($installed);
+        }
+
         public function installSchema(): bool
         {
             $this->logger->info("DatabaseWrapper::installSchema");
