@@ -2,7 +2,7 @@
 Custom php database wrapper
 
 # install
-> composer require "aportela/db-wrapper:dev-master"
+> composer require "aportela/db-wrapper"
 
 # install / initializate database example
 
