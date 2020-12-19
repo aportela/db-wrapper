@@ -109,7 +109,7 @@
             try
             {
                 $results = $this->query(" SELECT COUNT(name) AS table_count FROM sqlite_master WHERE type='table' AND name='VERSION'; ");
-                $installed = is_array($results) && count($results) == 1 && $results[0]->table_count == 1;                
+                $installed = is_array($results) && count($results) == 1 && $results[0]->table_count == 1;
             }
             catch (\aportela\DatabaseWrapper\Exception\DBException $e)
             {
@@ -154,6 +154,34 @@
                 $this->logger->emergency("DatabaseWrapper::installSchema FAILED (ERROR OPENING TRANSACTION)");
                 return(false);
             }
+        }
+
+        public function getCurrentSchemaVersion(): int
+        {
+            $this->logger->info("DatabaseWrapper::getCurrentSchemaVersion");
+            $results = $this->query($this->adapter->schema->getLastVersionQuery());
+            if (count($results) == 1)
+            {
+                return($results[0]->release_number);
+            }
+            else
+            {
+                return(-1);
+            }
+        }
+
+        public function getUpgradeSchemaVersion(): int
+        {
+            $this->logger->info("DatabaseWrapper::getUpgradeSchemaVersion");
+            $lastVersion = -1;
+            foreach($this->adapter->schema->getUpgradeQueries() as $version => $queries)
+            {
+                if ($version > $lastVersion)
+                {
+                    $lastVersion = $version;
+                }
+            }
+            return($lastVersion);
         }
 
         public function upgradeSchema(): int
