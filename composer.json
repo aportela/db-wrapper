@@ -9,12 +9,15 @@
             "email": "766f6964+github@gmail.com"
         }
     ],
-    "require": {
-        "monolog/monolog": "^1.25"
-    },
     "autoload": {
         "psr-4": {
             "aportela\\DatabaseWrapper\\": "src"
         }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "require": {
+        "psr/log": "^3.0"
     }
 }
