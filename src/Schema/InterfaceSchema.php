@@ -1,18 +1,16 @@
 <?php
 
-    namespace aportela\DatabaseWrapper\Schema;
+namespace aportela\DatabaseWrapper\Schema;
 
-    interface InterfaceSchema
-    {
-        public function __construct(string $upgradeSchemaPath = "");
+interface InterfaceSchema
+{
+    public function __construct(string $upgradeSchemaPath = "");
 
-        public function getInstallQueries(): array;
+    public function getInstallQueries(): array;
 
-        public function getSetVersionQuery(): string;
+    public function getSetVersionQuery(): string;
 
-        public function getLastVersionQuery(): string;
+    public function getLastVersionQuery(): string;
 
-        public function getUpgradeQueries(): array;
-    }
-
-?>
+    public function getUpgradeQueries(): array;
+}
