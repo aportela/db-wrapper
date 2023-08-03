@@ -2,11 +2,11 @@
 
 namespace aportela\DatabaseWrapper\Param;
 
-class NullParam implements InterfaceParam
+final class NullParam implements InterfaceParam
 {
-    protected $name;
+    private $name;
 
-    public function __construct(string $name, $value = null)
+    public function __construct(string $name, mixed $value = null)
     {
         $this->name = $name;
     }
@@ -16,7 +16,7 @@ class NullParam implements InterfaceParam
         return ($this->name);
     }
 
-    public function getValue()
+    public function getValue(): mixed
     {
         return (null);
     }

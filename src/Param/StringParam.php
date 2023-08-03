@@ -2,12 +2,12 @@
 
 namespace aportela\DatabaseWrapper\Param;
 
-class StringParam implements InterfaceParam
+final class StringParam implements InterfaceParam
 {
-    protected $name;
-    protected $value;
+    private string $name;
+    private string $value;
 
-    public function __construct(string $name, $value)
+    public function __construct(string $name, mixed $value)
     {
         $this->name = $name;
         if (is_string($value)) {
@@ -22,7 +22,7 @@ class StringParam implements InterfaceParam
         return ($this->name);
     }
 
-    public function getValue()
+    public function getValue(): mixed
     {
         return ($this->value);
     }
