@@ -2,7 +2,7 @@
 
 namespace aportela\DatabaseWrapper\Adapter;
 
-class PDOSQLiteAdapter implements InterfaceAdapter
+final class PDOSQLiteAdapter implements InterfaceAdapter
 {
     protected $dbh;
     public $schema;
@@ -20,7 +20,7 @@ class PDOSQLiteAdapter implements InterfaceAdapter
             );
             $this->schema = new \aportela\DatabaseWrapper\Schema\PDOSQLiteSchema($upgradeSchemaPath);
         } catch (\PDOException $e) {
-            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::__construct FAILED", self::EXCEPTION_CODE_CONSTRUCTOR, $e);
+            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::__construct FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::CONSTRUCTOR->value, $e);
         }
     }
 
@@ -35,7 +35,7 @@ class PDOSQLiteAdapter implements InterfaceAdapter
         try {
             $success = $this->dbh->beginTransaction();
         } catch (\PDOException $e) {
-            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::beginTransaction FAILED", self::EXCEPTION_CODE_BEGIN_TRANSACTION, $e);
+            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::beginTransaction FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::BEGIN_TRANSACTION->value, $e);
         }
         return ($success);
     }
@@ -46,7 +46,7 @@ class PDOSQLiteAdapter implements InterfaceAdapter
         try {
             $success = $this->dbh->commit();
         } catch (\PDOException $e) {
-            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::commit FAILED", self::EXCEPTION_CODE_COMMIT_TRANSACTION, $e);
+            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::commit FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::COMMIT_TRANSACTION->value, $e);
         }
         return ($success);
     }
@@ -57,7 +57,7 @@ class PDOSQLiteAdapter implements InterfaceAdapter
         try {
             $success = $this->dbh->rollBack();
         } catch (\PDOException $e) {
-            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::rollBack FAILED", self::EXCEPTION_CODE_ROLLBACK_TRANSACTION, $e);
+            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::rollBack FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::ROLLBACK_TRANSACTION->value, $e);
         }
         return ($success);
     }
@@ -92,7 +92,7 @@ class PDOSQLiteAdapter implements InterfaceAdapter
             }
             $affectedRows = $stmt->execute();
         } catch (\PDOException $e) {
-            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::exec FAILED", self::EXCEPTION_CODE_EXECUTE, $e);
+            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::exec FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::EXECUTE->value, $e);
         }
         return ($affectedRows);
     }
@@ -132,7 +132,7 @@ class PDOSQLiteAdapter implements InterfaceAdapter
             }
             $stmt->closeCursor();
         } catch (\PDOException $e) {
-            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::query FAILED", self::EXCEPTION_CODE_QUERY, $e);
+            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::query FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::QUERY->value, $e);
         }
         return ($rows);
     }
