@@ -2,12 +2,12 @@
 
 namespace aportela\DatabaseWrapper;
 
-class DB
+final class DB
 {
-    protected $adapter;
-    protected $logger;
+    protected \aportela\DatabaseWrapper\Adapter\InterfaceAdapter $adapter;
+    protected \Psr\Log\LoggerInterface $logger;
 
-    public function __construct(Adapter\InterfaceAdapter $adapter, \Psr\Log\LoggerInterface $logger)
+    public function __construct(\aportela\DatabaseWrapper\Adapter\InterfaceAdapter $adapter, \Psr\Log\LoggerInterface $logger)
     {
         $this->adapter = $adapter;
         $this->logger = $logger;
@@ -50,7 +50,7 @@ class DB
         $this->logger->debug("DatabaseWrapper::rollBack");
         $success = false;
         try {
-            $success = $this->adapter->commit();
+            $success = $this->adapter->rollBack();
         } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
             $this->logger->error("DatabaseWrapper::rollBack FAILED");
             throw $e;
@@ -190,6 +190,16 @@ class DB
         } else {
             $this->logger->emergency("DatabaseWrapper::upgradeSchema FAILED (NO PREVIOUS VERSION FOUND)");
             return (-1);
+        }
+    }
+
+    public function backup(): bool
+    {
+        if (is_a($this->adapter, \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::class)) {
+            // TODO: https://www.php.net/manual/en/sqlite3.backup.php
+            return (true);
+        } else {
+            return (false);
         }
     }
 }
