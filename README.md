@@ -1,7 +1,17 @@
 # db-wrapper
-Custom php database wrapper
+
+Custom php PDO database wrapper
+
+## Requirements
+
+- mininum php version 8.x
+
+## Limitations
+
+At this time only SQLite is supported.
 
 # install
+
 > composer require "aportela/db-wrapper"
 
 # install / initializate database example
@@ -11,12 +21,14 @@ Custom php database wrapper
     require ("vendor/autoload.php");
 
     $settings = array
-        (
+    (
         "database" => array
         (
             "filename" => "test.db",
             "path" => __DIR__ . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR
         ),
+        /* uncoment next setting & comment NullLogger constructor if you want file logs with (my) custom rotating handler*/
+        /*
         "logger" => array
         (
             "name" => "test",
@@ -24,6 +36,7 @@ Custom php database wrapper
             "path" => __DIR__ . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "logs" . DIRECTORY_SEPARATOR,
             "level" => \Monolog\Logger::DEBUG
         )
+        */
     );
 
     // create database directory if not found
@@ -31,7 +44,9 @@ Custom php database wrapper
     {
         mkdir($settings["database"]["path"]);
     }
-    
+
+    /*
+    // uncoment this & comment NullLogger constructor if you want file logs with (my) custom rotating handler
     // create log directory if not found
     if (! file_exists($settings["logger"]["path"]))
     {
@@ -44,10 +59,14 @@ Custom php database wrapper
     $handler = new \Monolog\Handler\RotatingFileHandler($settings["logger"]["path"] . $settings["logger"]["filename"], 0, $settings["logger"]["level"]);
     $handler->setFilenameFormat('{date}/{filename}', \Monolog\Handler\RotatingFileHandler::FILE_PER_DAY);
     $logger->pushHandler($handler);
+    */
+
+    // null logger (monolog) definition
+    $logger = new \Psr\Log\NullLogger("");
 
     // we are using PDO sqlite adapter (only available at this time)
     $adapter = new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter($settings["database"]["path"] . $settings["database"]["filename"]);
-    
+
     // main object
     $db = new \aportela\DatabaseWrapper\DB
     (
@@ -101,6 +120,8 @@ Custom php database wrapper
             "path" => __DIR__ . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR,
             "upgradeSchemaPath" => __DIR__ . DIRECTORY_SEPARATOR . "upgrade.sql"
         ),
+        /* uncoment next setting & comment NullLogger constructor if you want file logs with (my) custom rotating handler*/
+        /*
         "logger" => array
         (
             "name" => "test",
@@ -108,6 +129,7 @@ Custom php database wrapper
             "path" => __DIR__ . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR . "logs" . DIRECTORY_SEPARATOR,
             "level" => \Monolog\Logger::DEBUG
         )
+        */
     );
 
     // create database directory if not found
@@ -115,12 +137,25 @@ Custom php database wrapper
     {
         mkdir($settings["database"]["path"]);
     }
-    
+
+    /*
+    // uncoment this & comment NullLogger constructor if you want file logs with (my) custom rotating handler
     // create log directory if not found
     if (! file_exists($settings["logger"]["path"]))
     {
         mkdir($settings["logger"]["path"]);
     }
+
+    // logger (monolog) definition
+    $logger = new \Monolog\Logger($settings["logger"]["name"]);
+    $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
+    $handler = new \Monolog\Handler\RotatingFileHandler($settings["logger"]["path"] . $settings["logger"]["filename"], 0, $settings["logger"]["level"]);
+    $handler->setFilenameFormat('{date}/{filename}', \Monolog\Handler\RotatingFileHandler::FILE_PER_DAY);
+    $logger->pushHandler($handler);
+    */
+
+    // null logger (monolog) definition
+    $logger = new \Psr\Log\NullLogger("");
 
     if (! file_exists($settings["database"]["upgradeSchemaPath"]))
     {
@@ -140,7 +175,7 @@ Custom php database wrapper
         // READ upgrade SQL schema file definition on next block of this README.md
         $settings["database"]["upgradeSchemaPath"]
     );
-    
+
     // main object
     $db = new \aportela\DatabaseWrapper\DB
     (
@@ -154,7 +189,7 @@ Custom php database wrapper
     {
         echo sprintf("Database upgrade success, current version: %s%s", $currentVersion, PHP_EOL);
         $db->query(" CREATE TABLE IF NOT EXISTS MYTABLE (id INTEGER PRIMARY KEY, name VARCHAR(32)); ");
-        $db->query(" INSERT INTO MYTABLE (name) VALUES (:name); ", 
+        $db->query(" INSERT INTO MYTABLE (name) VALUES (:name); ",
             array
             (
                 new \aportela\DatabaseWrapper\Param\StringParam(":name", "foobar-" .uniqid())
