@@ -2,7 +2,7 @@
 
 namespace aportela\DatabaseWrapper\Schema;
 
-class PDOSQLiteSchema implements InterfaceSchema
+final class PDOSQLiteSchema implements InterfaceSchema
 {
     protected $upgradeSchemaPath;
 
