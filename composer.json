@@ -1,6 +1,6 @@
 {
     "name": "aportela/db-wrapper",
-    "description": "Custom database wrapper",
+    "description": "Custom PDO database wrapper",
     "type": "library",
     "license": "GPL-3.0-only",
     "authors": [
@@ -9,6 +9,7 @@
             "email": "766f6964+github@gmail.com"
         }
     ],
+    "homepage": "https://github.com/aportela/db-wrapper",
     "autoload": {
         "psr-4": {
             "aportela\\DatabaseWrapper\\": "src"
@@ -18,6 +19,13 @@
         "sort-packages": true
     },
     "require": {
+        "php": ">=8.0",
         "psr/log": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.2"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit --colors=always src/Test/SQLiteTest.php --display-warnings"
     }
 }
