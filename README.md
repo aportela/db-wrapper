@@ -183,8 +183,8 @@ At this time only SQLite is supported.
         $logger
     );
 
-    // try to upgrade SQL schema to last version
-    $currentVersion = $db->upgradeSchema();
+    // try to upgrade SQL schema to last version (making a backup before any modification, change parameter to false to skip creating the backup, NOT RECOMMENDED)
+    $currentVersion = $db->upgradeSchema(true);
     if ($currentVersion !== -1)
     {
         echo sprintf("Database upgrade success, current version: %s%s", $currentVersion, PHP_EOL);
