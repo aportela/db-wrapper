@@ -16,7 +16,6 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
 
     public static function setUpBeforeClass(): void
     {
-        echo "before";
         parent::setUpBeforeClass();
         self::$databasePath = tempnam(sys_get_temp_dir(), 'sqlite');
         self::$upgradeSchemaPath = tempnam(sys_get_temp_dir(), 'sql');
@@ -38,7 +37,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
                     )
                 );
         ";
-        file_put_contents(self::$upgradeSchemaPath, $upgradeSchema);
+        file_put_contents(self::$upgradeSchemaPath, trim($upgradeSchema));
         // main object
         self::$db = new \aportela\DatabaseWrapper\DB(
             new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter(self::$databasePath, self::$upgradeSchemaPath),
