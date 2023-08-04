@@ -26,6 +26,6 @@
         "phpunit/phpunit": "^10.2"
     },
     "scripts": {
-        "test": "vendor/bin/phpunit --colors=always src/Test/SQLiteTest.php --display-warnings"
+        "test": "vendor/bin/phpunit"
     }
 }
