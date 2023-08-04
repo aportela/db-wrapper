@@ -4,12 +4,14 @@ namespace aportela\DatabaseWrapper\Adapter;
 
 final class PDOSQLiteAdapter implements InterfaceAdapter
 {
-    protected $dbh;
-    public $schema;
+    protected ?\PDO $dbh;
+    public ?\aportela\DatabaseWrapper\Schema\PDOSQLiteSchema $schema;
+    public ?string $databasePath;
 
     public function __construct(string $databasePath, string $upgradeSchemaPath = "")
     {
         try {
+            $this->databasePath = $databasePath;
             $this->dbh = new \PDO(
                 sprintf("sqlite:%s", $databasePath),
                 null,

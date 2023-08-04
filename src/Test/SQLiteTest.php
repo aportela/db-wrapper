@@ -144,4 +144,25 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
             $this->fail('begin transaction failed');
         }
     }
+
+    public function testBackupOnOriginalPath(): void
+    {
+        $backupFile = self::$db->backup();
+        $this->assertNotEmpty($backupFile);
+        $this->assertFileExists($backupFile);
+    }
+
+    public function testBackupOnCustomPath(): void
+    {
+        $backupFile = self::$db->backup(sys_get_temp_dir());
+        $this->assertNotEmpty($backupFile);
+        $this->assertFileExists($backupFile);
+    }
+
+    public function testBackupOnInvalidCustomPath(): void
+    {
+        $this->expectException(\aportela\DatabaseWrapper\Exception\DBException::class);
+        $this->expectExceptionCode(\aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_BACKUP_PATH->value);
+        self::$db->backup(sys_get_temp_dir() . uniqid() . DIRECTORY_SEPARATOR . uniqid() . DIRECTORY_SEPARATOR . uniqid() . DIRECTORY_SEPARATOR);
+    }
 }
