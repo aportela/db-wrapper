@@ -146,11 +146,14 @@ final class DB
         return ($lastVersion);
     }
 
-    public function upgradeSchema(): int
+    public function upgradeSchema(bool $backup = true): int
     {
         $this->logger->info("DatabaseWrapper::upgradeSchema");
         $results = $this->query($this->adapter->schema->getLastVersionQuery());
         if (count($results) == 1) {
+            if ($backup) {
+                $this->backup();
+            }
             if ($this->beginTransaction()) {
                 $success = false;
                 $currentVersion = $results[0]->release_number;

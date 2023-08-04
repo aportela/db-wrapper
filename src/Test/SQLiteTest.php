@@ -83,7 +83,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
         if (self::$db->isSchemaInstalled()) {
             $this->assertEquals(0, self::$db->getCurrentSchemaVersion());
             $this->assertEquals(2, self::$db->getUpgradeSchemaVersion());
-            $this->assertEquals(2, self::$db->upgradeSchema());
+            $this->assertEquals(2, self::$db->upgradeSchema(true));
         } else {
             $this->fail('Schema not installed');
         }
