@@ -138,6 +138,11 @@ At this time only SQLite is supported.
         mkdir($settings["database"]["path"]);
     }
 
+    if (! file_exists($settings["database"]["upgradeSchemaPath"]))
+    {
+        die(sprintf("Upgrade schema not found (at %s)%s", $settings["database"]["upgradeSchemaPath"], PHP_EOL));
+    }
+
     /*
     // uncoment this & comment NullLogger constructor if you want file logs with (my) custom rotating handler
     // create log directory if not found
@@ -156,18 +161,6 @@ At this time only SQLite is supported.
 
     // null logger (monolog) definition
     $logger = new \Psr\Log\NullLogger("");
-
-    if (! file_exists($settings["database"]["upgradeSchemaPath"]))
-    {
-        die(sprintf("Upgrade schema not found (at %s)%s", $settings["database"]["upgradeSchemaPath"], PHP_EOL));
-    }
-
-    // logger (monolog) definition
-    $logger = new \Monolog\Logger($settings["logger"]["name"]);
-    $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
-    $handler = new \Monolog\Handler\RotatingFileHandler($settings["logger"]["path"] . $settings["logger"]["filename"], 0, $settings["logger"]["level"]);
-    $handler->setFilenameFormat('{date}/{filename}', \Monolog\Handler\RotatingFileHandler::FILE_PER_DAY);
-    $logger->pushHandler($handler);
 
     // we are using PDO sqlite adapter (only available at this time), also set the upgrade scheme (point to a local file)
     $adapter = new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter(
