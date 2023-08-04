@@ -242,3 +242,5 @@ defined on $settings block of previous example
 
 ?>
 ```
+
+![PHP Composer](https://github.com/aportela/db-wrapper/actions/workflows/php.yml/badge.svg)
