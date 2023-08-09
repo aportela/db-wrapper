@@ -12,7 +12,9 @@ At this time only SQLite is supported.
 
 # install
 
-> composer require "aportela/db-wrapper"
+```
+composer require "aportela/db-wrapper"
+```
 
 # install / initializate database example
 
