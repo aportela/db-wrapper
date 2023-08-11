@@ -8,7 +8,6 @@ require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "vendor" . DIRECT
 
 final class SQLiteTest extends \PHPUnit\Framework\TestCase
 {
-
     protected static \aportela\DatabaseWrapper\DB $db;
 
     private static string $databasePath;

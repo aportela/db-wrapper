@@ -203,7 +203,7 @@ final class DB
                 $backupFilePath = "";
                 if (empty($path)) {
                     $backupFilePath = dirname($this->adapter->databasePath) . DIRECTORY_SEPARATOR . "backup-" . uniqid() . ".sqlite";
-                } else if (is_dir($path)) {
+                } elseif (is_dir($path)) {
                     $backupFilePath = realpath($path) . DIRECTORY_SEPARATOR . "backup-" . uniqid() . ".sqlite";
                 } else {
                     throw new \aportela\DatabaseWrapper\Exception\DBException("DB::backup FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_BACKUP_PATH->value);
