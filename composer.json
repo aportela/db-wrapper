@@ -2,7 +2,7 @@
     "name": "aportela/db-wrapper",
     "description": "Custom PDO database wrapper",
     "type": "library",
-    "license": "AFFERO GENERAL PUBLIC LICENSE",
+    "license": "AGPL-3.0-only",
     "authors": [
         {
             "name": "alex",
