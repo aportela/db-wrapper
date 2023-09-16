@@ -202,7 +202,7 @@ final class DB
             if (file_exists(($this->adapter->databasePath))) {
                 $backupFilePath = "";
                 if (empty($path)) {
-                    $backupFilePath = dirname($this->adapter->databasePath) . DIRECTORY_SEPARATOR . "backup-" . uniqid() . ".sqlite";
+                    $backupFilePath = dirname($this->adapter->databasePath) . DIRECTORY_SEPARATOR . "backup-" . time() . ".sqlite";
                 } elseif (is_dir($path)) {
                     $backupFilePath = realpath($path) . DIRECTORY_SEPARATOR . "backup-" . uniqid() . ".sqlite";
                 } else {
