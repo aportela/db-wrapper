@@ -28,7 +28,7 @@ final class PDOSQLiteAdapter implements InterfaceAdapter
 
     public function __destruct()
     {
-        $this->dbh = null;
+        $this->close();
     }
 
     public function beginTransaction(): bool
@@ -137,5 +137,10 @@ final class PDOSQLiteAdapter implements InterfaceAdapter
             throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::query FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::QUERY->value, $e);
         }
         return ($rows);
+    }
+
+    public function close(): void
+    {
+        $this->dbh = null;
     }
 }

@@ -60,7 +60,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
     {
         parent::tearDownAfterClass();
         if (file_exists(self::$databasePath)) {
-            //unlink(self::$databasePath); // TODO: (Resource temporarily unavailable)
+            unlink(self::$databasePath);
         }
     }
 
@@ -73,8 +73,6 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
             $this->fail('Schema already installed');
         }
     }
-
-
 
     public function testUpgradeSchema(): void
     {
@@ -162,5 +160,12 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\aportela\DatabaseWrapper\Exception\DBException::class);
         $this->expectExceptionCode(\aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_BACKUP_PATH->value);
         self::$db->backup(sys_get_temp_dir() . uniqid() . DIRECTORY_SEPARATOR . uniqid() . DIRECTORY_SEPARATOR . uniqid() . DIRECTORY_SEPARATOR);
+    }
+
+    // this needs to be the final test
+    public function testCloseAtEnd(): void
+    {
+        $this->expectNotToPerformAssertions();
+        self::$db->close();
     }
 }

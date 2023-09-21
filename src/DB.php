@@ -4,7 +4,7 @@ namespace aportela\DatabaseWrapper;
 
 final class DB
 {
-    protected \aportela\DatabaseWrapper\Adapter\InterfaceAdapter $adapter;
+    protected ?\aportela\DatabaseWrapper\Adapter\InterfaceAdapter $adapter;
     protected \Psr\Log\LoggerInterface $logger;
 
     public function __construct(\aportela\DatabaseWrapper\Adapter\InterfaceAdapter $adapter, \Psr\Log\LoggerInterface $logger)
@@ -17,6 +17,7 @@ final class DB
     public function __destruct()
     {
         $this->logger->debug("DatabaseWrapper::__destruct");
+        //$this->close();
     }
 
     public function beginTransaction(): bool
@@ -82,6 +83,12 @@ final class DB
             throw $e;
         }
         return ($rows);
+    }
+
+    public function close(): void
+    {
+        $this->adapter->close();
+        $this->adapter = null;
     }
 
     public function isSchemaInstalled(): bool
