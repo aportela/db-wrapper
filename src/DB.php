@@ -17,13 +17,12 @@ final class DB
     public function __destruct()
     {
         $this->logger->debug("DatabaseWrapper::__destruct");
-        //$this->close();
     }
 
     public function inTransaction(): bool
     {
         $this->logger->debug("DatabaseWrapper::inTransaction");
-        $success = false;
+        $activeTransaction = false;
         try {
             $activeTransaction = $this->adapter->inTransaction();
         } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
@@ -72,14 +71,30 @@ final class DB
         return ($success);
     }
 
+    private function parseQuery(string $query, $params = array()): string
+    {
+        foreach ($params as $param) {
+            if (get_class($param) == "aportela\DatabaseWrapper\Param\StringParam") {
+                $query = str_replace($param->getName(), "'" . $param->getValue() . "'", $query);
+            } else {
+                $query = str_replace($param->getName(), $param->getValue(), $query);
+            }
+        }
+        $expression = '/[\r\n\t]/';
+        $query = preg_replace($expression, " ", $query);
+        $expression = '/\s+/';
+        $query = preg_replace($expression, " ", $query);
+        return ($query);
+    }
+
     public function exec(string $query, $params = array()): int
     {
-        $this->logger->debug("DatabaseWrapper::exec");
+        $this->logger->debug("DatabaseWrapper::exec", array("SQL" => $this->parseQuery($query, $params)));
         $rowCount = 0;
         try {
             $rowCount = $this->adapter->exec($query, $params);
         } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $this->logger->error("DatabaseWrapper::query FAILED", array("QUERY" => $query, "PARAMS" => $params, "ERROR" => $e->getPrevious()->getMessage()));
+            $this->logger->error("DatabaseWrapper::exec FAILED", array("ERROR" => $e->getPrevious()->getMessage()));
             throw $e;
         }
         return ($rowCount);
@@ -87,12 +102,12 @@ final class DB
 
     public function query(string $query, $params = array()): array
     {
-        $this->logger->debug("DatabaseWrapper::query");
+        $this->logger->debug("DatabaseWrapper::query", array("SQL" => $this->parseQuery($query, $params)));
         $rows = array();
         try {
             $rows = $this->adapter->query($query, $params);
         } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $this->logger->error("DatabaseWrapper::query FAILED", array("QUERY" => $query, "PARAMS" => $params, "ERROR" => $e->getPrevious()->getMessage()));
+            $this->logger->error("DatabaseWrapper::query FAILED", array($params, "ERROR" => $e->getPrevious()->getMessage()));
             throw $e;
         }
         return ($rows);
