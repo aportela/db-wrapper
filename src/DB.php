@@ -75,9 +75,9 @@ final class DB
     {
         foreach ($params as $param) {
             if (get_class($param) == "aportela\DatabaseWrapper\Param\StringParam") {
-                $query = str_replace($param->getName(), "'" . $param->getValue() . "'", $query);
+                $query = str_replace($param->getName(), "'" . $param->getValue() ?? "" . "'", $query);
             } else {
-                $query = str_replace($param->getName(), $param->getValue(), $query);
+                $query = str_replace($param->getName(), $param->getValue() ?? "", $query);
             }
         }
         $expression = '/[\r\n\t]/';
