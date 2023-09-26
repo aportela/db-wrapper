@@ -20,6 +20,19 @@ final class DB
         //$this->close();
     }
 
+    public function inTransaction(): bool
+    {
+        $this->logger->debug("DatabaseWrapper::inTransaction");
+        $success = false;
+        try {
+            $activeTransaction = $this->adapter->inTransaction();
+        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+            $this->logger->error("DatabaseWrapper::inTransaction FAILED");
+            throw $e;
+        }
+        return ($activeTransaction);
+    }
+
     public function beginTransaction(): bool
     {
         $this->logger->debug("DatabaseWrapper::beginTransaction");

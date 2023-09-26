@@ -42,6 +42,18 @@ final class PDOSQLiteAdapter implements InterfaceAdapter
         return ($success);
     }
 
+    public function inTransaction(): bool
+    {
+        $activeTransaction = false;
+        try {
+            $activeTransaction = $this->dbh->inTransaction();
+        } catch (\PDOException $e) {
+            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::beginTransaction FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::IN_TRANSACTION_CHECK->value, $e);
+        }
+        return ($activeTransaction);
+    }
+
+
     public function commit(): bool
     {
         $success = false;

@@ -108,6 +108,25 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $rows[1]->id);
     }
 
+    public function testInTransactionWithTransaction(): void
+    {
+        if (self::$db->beginTransaction()) {
+            $inTransaction = self::$db->inTransaction();
+            if (self::$db->commit()) {
+                $this->assertTrue($inTransaction);
+            } else {
+                $this->fail('commit failed');
+            }
+        } else {
+            $this->fail('begin transaction failed');
+        }
+    }
+
+    public function testInTransactionWithoutTransaction(): void
+    {
+        $this->assertFalse(self::$db->inTransaction());
+    }
+
     public function testCommitTransaction(): void
     {
         if (self::$db->beginTransaction()) {
