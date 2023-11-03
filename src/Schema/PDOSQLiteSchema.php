@@ -8,17 +8,17 @@ final class PDOSQLiteSchema implements InterfaceSchema
 
     private const INSTALL_QUERIES = array(
         '
-                CREATE TABLE "VERSION" (
-                    "release_number" INTEGER NOT NULL,
-                    "release_date" STRING NOT NULL,
-                    PRIMARY KEY("release_number")
-                );
+            CREATE TABLE "VERSION" (
+                "release_number" INTEGER NOT NULL,
+                "release_date" STRING NOT NULL,
+                PRIMARY KEY("release_number")
+            );
         ',
         '
-                INSERT INTO "VERSION" (release_number, release_date) VALUES (0, datetime());
+            INSERT INTO "VERSION" (release_number, release_date) VALUES (0, datetime());
         ',
         '
-                PRAGMA journal_mode=WAL;
+            PRAGMA journal_mode=WAL;
         '
     );
 
