@@ -9,8 +9,8 @@ final class PDOSQLiteSchema implements InterfaceSchema
     private const INSTALL_QUERIES = array(
         '
                 CREATE TABLE "VERSION" (
-                    "release_number"	INTEGER NOT NULL,
-                    "release_date"	STRING NOT NULL,
+                    "release_number" INTEGER NOT NULL,
+                    "release_date" STRING NOT NULL,
                     PRIMARY KEY("release_number")
                 );
         ',
