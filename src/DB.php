@@ -126,7 +126,7 @@ final class DB
         try {
             if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
                 $results = $this->query(" SELECT COUNT(name) AS table_count FROM sqlite_master WHERE type='table' AND name='VERSION'; ");
-            } else if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter) {
+            } elseif ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter) {
                 $results = $this->query(
                     " SELECT COUNT(*) AS table_count FROM information_schema.tables WHERE table_schema = :dbName AND table_name = :tableName; ",
                     [
@@ -135,7 +135,7 @@ final class DB
                     ]
                 );
             } else {
-                throw new \aportela\DatabaseWrapper\Exception\DBException("Invalid adapter");
+                throw new \aportela\DatabaseWrapper\Exception\DBException("DB::isSchemaInstalled FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_ADAPTER->value);
             }
             $installed = is_array($results) && count($results) == 1 && $results[0]->table_count == 1;
         } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
@@ -147,7 +147,19 @@ final class DB
     public function installSchema(): bool
     {
         $this->logger->info("DatabaseWrapper::installSchema");
-        if ($this->beginTransaction()) {
+        // allow transactions only for sqlite adapters
+        // FROM php documentation:
+        // Some databases, including MySQL, automatically issue an implicit COMMIT when a database definition language (DDL) statement such as DROP TABLE or CREATE TABLE is issued within a transaction.
+        // The implicit COMMIT will prevent you from rolling back any other changes within the transaction boundary.
+        $success = false;
+        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+            $success = $this->beginTransaction();
+        } elseif ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter) {
+            $success = true;
+        } else {
+            throw new \aportela\DatabaseWrapper\Exception\DBException("DB::isSchemaInstalled FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_ADAPTER->value);
+        }
+        if ($success) {
             $installed = false;
             try {
                 foreach ($this->adapter->schema->getInstallQueries() as $query) {
@@ -158,10 +170,14 @@ final class DB
                 $this->logger->error("DatabaseWrapper::installSchema", [$e->getMessage()]);
             } finally {
                 if ($installed) {
-                    $this->commit();
+                    if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+                        $this->commit();
+                    }
                     $this->logger->info("DatabaseWrapper::installSchema SUCCESS");
                 } else {
-                    $this->rollback();
+                    if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+                        $this->rollback();
+                    }
                     $this->logger->emergency("DatabaseWrapper::installSchema FAILED");
                 }
             }
@@ -200,10 +216,22 @@ final class DB
         $this->logger->info("DatabaseWrapper::upgradeSchema");
         $results = $this->query($this->adapter->schema->getLastVersionQuery());
         if (count($results) == 1) {
-            if ($backup) {
-                $this->backup();
+            if ($backup && $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+                $this->adapter->backup("");
             }
-            if ($this->beginTransaction()) {
+            // allow transactions only for sqlite adapters
+            // FROM php documentation:
+            // Some databases, including MySQL, automatically issue an implicit COMMIT when a database definition language (DDL) statement such as DROP TABLE or CREATE TABLE is issued within a transaction.
+            // The implicit COMMIT will prevent you from rolling back any other changes within the transaction boundary.
+            $success = false;
+            if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+                $success = $this->beginTransaction();
+            } elseif ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter) {
+                $success = true;
+            } else {
+                throw new \aportela\DatabaseWrapper\Exception\DBException("DB::isSchemaInstalled FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_ADAPTER->value);
+            }
+            if ($success) {
                 $success = false;
                 $currentVersion = $results[0]->release_number;
                 try {
@@ -227,10 +255,14 @@ final class DB
                     throw $e;
                 } finally {
                     if ($success) {
-                        $this->commit();
+                        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+                            $this->commit();
+                        }
                         $this->logger->info("DatabaseWrapper::upgradeSchema SUCCESS");
                     } else {
-                        $this->rollback();
+                        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+                            $this->rollback();
+                        }
                         $this->logger->emergency("DatabaseWrapper::upgradeSchema FAILED");
                     }
                 }
@@ -247,7 +279,7 @@ final class DB
 
     public function backup(string $path = ""): string
     {
-        if (is_a($this->adapter, \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::class)) {
+        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
             if (file_exists(($this->adapter->databasePath))) {
                 $backupFilePath = "";
                 if (empty($path)) {
