@@ -155,4 +155,22 @@ final class PDOSQLiteAdapter implements InterfaceAdapter
     {
         $this->dbh = null;
     }
+
+    public function backup(string $path): string
+    {
+        if (file_exists(($this->databasePath))) {
+            $backupFilePath = "";
+            if (empty($path)) {
+                $backupFilePath = dirname($this->databasePath) . DIRECTORY_SEPARATOR . "backup-" . time() . "-" . uniqid() . ".sqlite";
+            } elseif (is_dir($path)) {
+                $backupFilePath = realpath($path) . DIRECTORY_SEPARATOR . "backup-" . uniqid() . ".sqlite";
+            } else {
+                throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::backup FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_BACKUP_PATH->value);
+            }
+            $this->exec(" VACUUM main INTO :path", [new \aportela\DatabaseWrapper\Param\StringParam(":path", $backupFilePath)]);
+            return ($backupFilePath);
+        } else {
+            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOSQLiteAdapter::backup FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::DATABASE_NOT_FOUND->value);
+        }
+    }
 }
