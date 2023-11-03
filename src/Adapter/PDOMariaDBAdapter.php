@@ -80,7 +80,6 @@ final class PDOMariaDBAdapter implements InterfaceAdapter
     {
         $affectedRows = 0;
         try {
-
             $stmt = $this->dbh->prepare($query);
             $totalParams = count($params);
             if ($totalParams > 0) {
