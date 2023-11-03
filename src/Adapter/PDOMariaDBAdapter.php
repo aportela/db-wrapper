@@ -5,11 +5,13 @@ namespace aportela\DatabaseWrapper\Adapter;
 final class PDOMariaDBAdapter implements InterfaceAdapter
 {
     protected ?\PDO $dbh;
-    public ?\aportela\DatabaseWrapper\Schema\PDOSQLiteSchema $schema;
+    public ?string $dbName;
+    public ?\aportela\DatabaseWrapper\Schema\PDOMariaDBSchema $schema;
 
     public function __construct(string $host, string $dbName, string $username, string $password, string $upgradeSchemaPath = "")
     {
         try {
+            $this->dbName = $dbName;
             $this->dbh = new \PDO(
                 sprintf("mysql:host=%s;dbname=%s", $host, $dbName),
                 $username,
@@ -18,7 +20,7 @@ final class PDOMariaDBAdapter implements InterfaceAdapter
                     \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
                 )
             );
-            $this->schema = new \aportela\DatabaseWrapper\Schema\PDOSQLiteSchema($upgradeSchemaPath);
+            $this->schema = new \aportela\DatabaseWrapper\Schema\PDOMariaDBSchema($upgradeSchemaPath);
         } catch (\PDOException $e) {
             throw new \aportela\DatabaseWrapper\Exception\DBException("PDOMariaDBAdapter::__construct FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::CONSTRUCTOR->value, $e);
         }
