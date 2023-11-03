@@ -3,6 +3,7 @@
     <testsuites>
         <testsuite name="db-wrapper-test-suite">
             <file>src/Test/SQLiteTest.php</file>
+            <file>src/Test/MariaDBTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>
