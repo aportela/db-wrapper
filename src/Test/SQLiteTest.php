@@ -6,6 +6,7 @@ namespace aportela\DatabaseWrapper\Test;
 
 require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php";
 
+#[\PHPUnit\Framework\Attributes\RequiresPhpExtension('pdo_sqlite')]
 final class SQLiteTest extends \PHPUnit\Framework\TestCase
 {
     protected static \aportela\DatabaseWrapper\DB $db;
