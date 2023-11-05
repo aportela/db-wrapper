@@ -280,20 +280,7 @@ final class DB
     public function backup(string $path = ""): string
     {
         if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
-            if (file_exists(($this->adapter->databasePath))) {
-                $backupFilePath = "";
-                if (empty($path)) {
-                    $backupFilePath = dirname($this->adapter->databasePath) . DIRECTORY_SEPARATOR . "backup-" . time() . "-" . uniqid() . ".sqlite";
-                } elseif (is_dir($path)) {
-                    $backupFilePath = realpath($path) . DIRECTORY_SEPARATOR . "backup-" . uniqid() . ".sqlite";
-                } else {
-                    throw new \aportela\DatabaseWrapper\Exception\DBException("DB::backup FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_BACKUP_PATH->value);
-                }
-                $this->exec(" VACUUM main INTO :path", [new \aportela\DatabaseWrapper\Param\StringParam(":path", $backupFilePath)]);
-                return ($backupFilePath);
-            } else {
-                throw new \aportela\DatabaseWrapper\Exception\DBException("DB::backup FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::DATABASE_NOT_FOUND->value);
-            }
+            return ($this->adapter->backup($path));
         } else {
             throw new \aportela\DatabaseWrapper\Exception\DBException("DB::backup FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_ADAPTER->value);
         }
