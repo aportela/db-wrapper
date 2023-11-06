@@ -49,7 +49,7 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
             // main object
             self::$db = new \aportela\DatabaseWrapper\DB(
                 new \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter(self::$host, self::$dbName, self::$username, self::$password, self::$upgradeSchemaPath),
-                new \Psr\Log\NullLogger("")
+                new \Psr\Log\NullLogger()
             );
             self::$db->exec(" DROP TABLE IF EXISTS `VERSION`; ");
             self::$db->exec(" DROP TABLE IF EXISTS `TABLEV1`; ");

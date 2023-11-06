@@ -41,7 +41,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
         // main object
         self::$db = new \aportela\DatabaseWrapper\DB(
             new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter(self::$databasePath, self::$upgradeSchemaPath),
-            new \Psr\Log\NullLogger("")
+            new \Psr\Log\NullLogger()
         );
     }
 
