@@ -155,7 +155,7 @@ final class PDOMariaDBAdapter implements InterfaceAdapter
         $this->dbh = null;
     }
 
-    public function hasSchemaInstalled(): bool
+    public function isSchemaInstalled(): bool
     {
         $results = $this->query(
             " SELECT COUNT(*) AS table_count FROM information_schema.tables WHERE table_schema = :dbName AND table_name = :tableName; ",

@@ -18,5 +18,5 @@ interface InterfaceAdapter
 
     public function close(): void;
 
-    public function hasSchemaInstalled(): bool;
+    public function isSchemaInstalled(): bool;
 }

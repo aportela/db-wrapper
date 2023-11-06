@@ -155,7 +155,7 @@ final class PDOSQLiteAdapter implements InterfaceAdapter
         $this->dbh = null;
     }
 
-    public function hasSchemaInstalled(): bool
+    public function isSchemaInstalled(): bool
     {
         $results = $this->query(" SELECT COUNT(name) AS table_count FROM sqlite_master WHERE type='table' AND name='VERSION'; ");
         return (is_array($results) && count($results) == 1 && $results[0]->table_count == 1);
