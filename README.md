@@ -8,7 +8,7 @@ Custom php PDO database wrapper
 
 ## Limitations
 
-At this time only SQLite is supported.
+At this time only SQLite, MariaDB/MySQL, PostgreSQL adapters are supported.
 
 # install
 
