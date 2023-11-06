@@ -154,4 +154,16 @@ final class PDOMariaDBAdapter implements InterfaceAdapter
     {
         $this->dbh = null;
     }
+
+    public function hasSchemaInstalled(): bool
+    {
+        $results = $this->query(
+            " SELECT COUNT(*) AS table_count FROM information_schema.tables WHERE table_schema = :dbName AND table_name = :tableName; ",
+            [
+                new \aportela\DatabaseWrapper\Param\StringParam(":dbName", $this->dbName),
+                new \aportela\DatabaseWrapper\Param\StringParam(":tableName", "VERSION"),
+            ]
+        );
+        return (is_array($results) && count($results) == 1 && $results[0]->table_count == 1);
+    }
 }

@@ -17,4 +17,6 @@ interface InterfaceAdapter
     public function query(string $query, $params = array()): array;
 
     public function close(): void;
+
+    public function hasSchemaInstalled(): bool;
 }

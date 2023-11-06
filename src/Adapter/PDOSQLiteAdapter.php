@@ -53,7 +53,6 @@ final class PDOSQLiteAdapter implements InterfaceAdapter
         return ($activeTransaction);
     }
 
-
     public function commit(): bool
     {
         $success = false;
@@ -154,6 +153,12 @@ final class PDOSQLiteAdapter implements InterfaceAdapter
     public function close(): void
     {
         $this->dbh = null;
+    }
+
+    public function hasSchemaInstalled(): bool
+    {
+        $results = $this->query(" SELECT COUNT(name) AS table_count FROM sqlite_master WHERE type='table' AND name='VERSION'; ");
+        return (is_array($results) && count($results) == 1 && $results[0]->table_count == 1);
     }
 
     public function backup(string $path): string

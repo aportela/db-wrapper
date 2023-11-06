@@ -122,26 +122,7 @@ final class DB
     public function isSchemaInstalled(): bool
     {
         $this->logger->info("DatabaseWrapper::isSchemaInstalled");
-        $installed = false;
-        try {
-            if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
-                $results = $this->query(" SELECT COUNT(name) AS table_count FROM sqlite_master WHERE type='table' AND name='VERSION'; ");
-            } elseif ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter) {
-                $results = $this->query(
-                    " SELECT COUNT(*) AS table_count FROM information_schema.tables WHERE table_schema = :dbName AND table_name = :tableName; ",
-                    [
-                        new \aportela\DatabaseWrapper\Param\StringParam(":dbName", $this->adapter->dbName),
-                        new \aportela\DatabaseWrapper\Param\StringParam(":tableName", "VERSION"),
-                    ]
-                );
-            } else {
-                throw new \aportela\DatabaseWrapper\Exception\DBException("DB::isSchemaInstalled FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_ADAPTER->value);
-            }
-            $installed = is_array($results) && count($results) == 1 && $results[0]->table_count == 1;
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $this->logger->error("DatabaseWrapper::isSchemaInstalled", [$e->getMessage()]);
-        }
-        return ($installed);
+        return ($this->adapter->hasSchemaInstalled());
     }
 
     public function installSchema(): bool
