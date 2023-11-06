@@ -122,7 +122,7 @@ final class DB
     public function isSchemaInstalled(): bool
     {
         $this->logger->info("DatabaseWrapper::isSchemaInstalled");
-        return ($this->adapter->hasSchemaInstalled());
+        return ($this->adapter->isSchemaInstalled());
     }
 
     public function installSchema(): bool
@@ -133,7 +133,7 @@ final class DB
         // Some databases, including MySQL, automatically issue an implicit COMMIT when a database definition language (DDL) statement such as DROP TABLE or CREATE TABLE is issued within a transaction.
         // The implicit COMMIT will prevent you from rolling back any other changes within the transaction boundary.
         $success = false;
-        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
             $success = $this->beginTransaction();
         } elseif ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter) {
             $success = true;
@@ -151,12 +151,12 @@ final class DB
                 $this->logger->error("DatabaseWrapper::installSchema", [$e->getMessage()]);
             } finally {
                 if ($installed) {
-                    if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+                    if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                         $this->commit();
                     }
                     $this->logger->info("DatabaseWrapper::installSchema SUCCESS");
                 } else {
-                    if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+                    if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                         $this->rollback();
                     }
                     $this->logger->emergency("DatabaseWrapper::installSchema FAILED");
@@ -205,7 +205,7 @@ final class DB
             // Some databases, including MySQL, automatically issue an implicit COMMIT when a database definition language (DDL) statement such as DROP TABLE or CREATE TABLE is issued within a transaction.
             // The implicit COMMIT will prevent you from rolling back any other changes within the transaction boundary.
             $success = false;
-            if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+            if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                 $success = $this->beginTransaction();
             } elseif ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter) {
                 $success = true;
@@ -236,12 +236,12 @@ final class DB
                     throw $e;
                 } finally {
                     if ($success) {
-                        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+                        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                             $this->commit();
                         }
                         $this->logger->info("DatabaseWrapper::upgradeSchema SUCCESS");
                     } else {
-                        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+                        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                             $this->rollback();
                         }
                         $this->logger->emergency("DatabaseWrapper::upgradeSchema FAILED");
