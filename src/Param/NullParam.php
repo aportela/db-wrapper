@@ -4,7 +4,7 @@ namespace aportela\DatabaseWrapper\Param;
 
 final class NullParam implements InterfaceParam
 {
-    private $name;
+    private string $name;
 
     public function __construct(string $name, mixed $value = null)
     {
