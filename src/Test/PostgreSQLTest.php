@@ -22,7 +22,7 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUpBeforeClass();
         self::$host = getenv('PGSQL_HOST', true) ? getenv('PGSQL_HOST') : null;
-        self::$port = getenv('PGSQL_PORT', true) ? getenv('PGSQL_PORT') : 5432;
+        self::$port = getenv('PGSQL_PORT', true) ? getenv('PGSQL_PORT') : \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter::DEFAULT_PORT;
         self::$dbName = getenv('PGSQL_DBNAME', true) ? getenv('PGSQL_DBNAME') : null;
         self::$username = getenv('PGSQL_USERNAME', true) ? getenv('PGSQL_USERNAME') : null;
         self::$password = getenv('PGSQL_PASSWORD', true) ? getenv('PGSQL_PASSWORD') : null;
@@ -51,7 +51,7 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
             // main object
             self::$db = new \aportela\DatabaseWrapper\DB(
                 new \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter(self::$host, self::$port, self::$dbName, self::$username, self::$password, self::$upgradeSchemaPath),
-                new \Psr\Log\NullLogger("")
+                new \Psr\Log\NullLogger()
             );
             self::$db->exec(' DROP TABLE IF EXISTS "VERSION"; ');
             self::$db->exec(' DROP TABLE IF EXISTS "TABLEV1"; ');

@@ -4,11 +4,12 @@ namespace aportela\DatabaseWrapper\Adapter;
 
 final class PDOPostgreSQLAdapter implements InterfaceAdapter
 {
+    public const DEFAULT_PORT = 5432;
     protected ?\PDO $dbh;
     public ?string $dbName;
     public ?\aportela\DatabaseWrapper\Schema\PDOPostgreSQLSchema $schema;
 
-    public function __construct(string $host, int $port = 5432, string $dbName, string $username, string $password, string $upgradeSchemaPath = "")
+    public function __construct(string $host, int $port, string $dbName, string $username, string $password, string $upgradeSchemaPath = "")
     {
         try {
             $this->dbName = $dbName;
