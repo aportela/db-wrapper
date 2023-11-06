@@ -30,6 +30,6 @@
     "scripts": {
         "test": "vendor/bin/phpunit --testdox",
         "fix" : "vendor/bin/php-cs-fixer fix src",
-        "stan": "vendor/bin/phpstan analyse -l 6 src"
+        "stan": "vendor/bin/phpstan analyse -c phpstan.neon"
     }
 }
