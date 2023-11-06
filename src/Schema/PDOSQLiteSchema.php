@@ -4,7 +4,7 @@ namespace aportela\DatabaseWrapper\Schema;
 
 final class PDOSQLiteSchema implements InterfaceSchema
 {
-    protected $upgradeSchemaPath;
+    protected string $upgradeSchemaPath;
 
     private const INSTALL_QUERIES = array(
         '
