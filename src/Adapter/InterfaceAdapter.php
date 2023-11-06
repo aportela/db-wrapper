@@ -12,9 +12,18 @@ interface InterfaceAdapter
 
     public function rollBack(): bool;
 
-    public function exec(string $query, $params = array()): int;
+    public function exec(string $query): int;
 
-    public function query(string $query, $params = array()): array;
+    /**
+     * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
+     */
+    public function execute(string $query, array $params = array()): bool;
+
+    /**
+     * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
+     * @return array<Object>
+     */
+    public function query(string $query, array $params = array()): array;
 
     public function close(): void;
 

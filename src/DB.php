@@ -71,6 +71,9 @@ final class DB
         return ($success);
     }
 
+    /**
+     * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
+     */
     private function parseQuery(string $query, $params = array()): string
     {
         foreach ($params as $param) {
@@ -87,12 +90,12 @@ final class DB
         return ($query);
     }
 
-    public function exec(string $query, $params = array()): int
+    public function exec(string $query): int
     {
-        $this->logger->debug("DatabaseWrapper::exec", array("SQL" => $this->parseQuery($query, $params)));
+        $this->logger->debug("DatabaseWrapper::exec", array("SQL" => $this->parseQuery($query)));
         $rowCount = 0;
         try {
-            $rowCount = $this->adapter->exec($query, $params);
+            $rowCount = $this->adapter->exec($query);
         } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
             $this->logger->error("DatabaseWrapper::exec FAILED", array("ERROR" => $e->getPrevious()->getMessage()));
             throw $e;
@@ -100,7 +103,27 @@ final class DB
         return ($rowCount);
     }
 
-    public function query(string $query, $params = array()): array
+    /**
+     * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
+     */
+    public function execute(string $query, array $params = array()): bool
+    {
+        $this->logger->debug("DatabaseWrapper::execute", array("SQL" => $this->parseQuery($query, $params)));
+        $success = false;
+        try {
+            $success = $this->adapter->execute($query, $params);
+        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+            $this->logger->error("DatabaseWrapper::execute FAILED", array("ERROR" => $e->getPrevious()->getMessage()));
+            throw $e;
+        }
+        return ($success);
+    }
+
+    /**
+     * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
+     * @return array<Object>
+     */
+    public function query(string $query, array $params = array()): array
     {
         $this->logger->debug("DatabaseWrapper::query", array("SQL" => $this->parseQuery($query, $params)));
         $rows = array();
@@ -221,7 +244,7 @@ final class DB
                             foreach ($queries as $query) {
                                 $this->exec($query);
                             }
-                            $this->exec(
+                            $this->execute(
                                 $this->adapter->schema->getSetVersionQuery(),
                                 array(
                                     new \aportela\DatabaseWrapper\Param\IntegerParam(":release_number", $version)

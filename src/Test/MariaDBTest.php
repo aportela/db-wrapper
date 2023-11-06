@@ -12,6 +12,7 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
     protected static ?\aportela\DatabaseWrapper\DB $db;
 
     private static ?string $host;
+    private static ?int $port;
     private static ?string $dbName;
     private static ?string $username;
     private static ?string $password;
@@ -21,6 +22,7 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUpBeforeClass();
         self::$host = getenv('MARIADB_HOST', true) ? getenv('MARIADB_HOST') : null;
+        self::$port = getenv('MARIADB_PORT', true) ? getenv('MARIADB_PORT') : \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter::DEFAULT_PORT;
         self::$dbName = getenv('MARIADB_DBNAME', true) ? getenv('MARIADB_DBNAME') : null;
         self::$username = getenv('MARIADB_USERNAME', true) ? getenv('MARIADB_USERNAME') : null;
         self::$password = getenv('MARIADB_PASSWORD', true) ? getenv('MARIADB_PASSWORD') : null;
@@ -39,6 +41,7 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
                         2 => array
                         (
                             \" CREATE TABLE IF NOT EXISTS TABLEV2 (id INTEGER PRIMARY KEY); \",
+                            \" INSERT INTO TABLEV2 VALUES (-1); \"
                         )
                     )
                 );
@@ -48,12 +51,12 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
             file_put_contents(self::$upgradeSchemaPath, trim($upgradeSchema));
             // main object
             self::$db = new \aportela\DatabaseWrapper\DB(
-                new \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter(self::$host, self::$dbName, self::$username, self::$password, self::$upgradeSchemaPath),
+                new \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter(self::$host, self::$port, self::$dbName, self::$username, self::$password, self::$upgradeSchemaPath),
                 new \Psr\Log\NullLogger()
             );
-            self::$db->exec(" DROP TABLE IF EXISTS `VERSION`; ");
-            self::$db->exec(" DROP TABLE IF EXISTS `TABLEV1`; ");
-            self::$db->exec(" DROP TABLE IF EXISTS `TABLEV2`; ");
+            self::$db->execute(" DROP TABLE IF EXISTS `VERSION`; ");
+            self::$db->execute(" DROP TABLE IF EXISTS `TABLEV1`; ");
+            self::$db->execute(" DROP TABLE IF EXISTS `TABLEV2`; ");
         }
     }
 
@@ -100,9 +103,19 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testExec(): void
+    public function testExecWithAffectedRows(): void
     {
-        $this->assertEquals(1, self::$db->exec(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 1)]));
+        $this->assertEquals(1, self::$db->exec(" UPDATE TABLEV2 SET id = 0 WHERE id = -1 "));
+    }
+
+    public function testExecWithoutAffectedRows(): void
+    {
+        $this->assertEquals(0, self::$db->exec(" UPDATE TABLEV2 SET id = -2 WHERE id = -1 "));
+    }
+
+    public function testExecute(): void
+    {
+        $this->assertTrue(self::$db->execute(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 1)]));
     }
 
     public function testExistentRow(): void
@@ -115,7 +128,7 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMultipleRows(): void
     {
-        $this->assertEquals(1, self::$db->exec(" INSERT INTO TABLEV1 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
+        $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV1 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
         $rows = self::$db->query(" SELECT id FROM TABLEV1 ", []);
         $this->assertIsArray($rows);
         $this->assertCount(2, $rows);
@@ -145,7 +158,7 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
     public function testCommitTransaction(): void
     {
         if (self::$db->beginTransaction()) {
-            $this->assertEquals(1, self::$db->exec(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
+            $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
             if (self::$db->commit()) {
                 $rows = self::$db->query(" SELECT id FROM TABLEV2 WHERE id = :id ", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]);
                 $this->assertIsArray($rows);
@@ -162,7 +175,7 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
     public function testRollbackTransaction(): void
     {
         if (self::$db->beginTransaction()) {
-            $this->assertEquals(1, self::$db->exec(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]));
+            $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]));
             if (self::$db->rollBack()) {
                 $rows = self::$db->query(" SELECT id FROM TABLEV2 WHERE id = :id ", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]);
                 $this->assertIsArray($rows);

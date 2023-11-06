@@ -33,6 +33,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
                         2 => array
                         (
                             \" CREATE TABLE IF NOT EXISTS TABLEV2 (id INTEGER PRIMARY KEY); \",
+                            \" INSERT INTO TABLEV2 VALUES (-1); \"
                         )
                     )
                 );
@@ -86,9 +87,19 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testExec(): void
+    public function testExecWithAffectedRows(): void
     {
-        $this->assertEquals(1, self::$db->exec(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 1)]));
+        $this->assertEquals(1, self::$db->exec(" UPDATE TABLEV2 SET id = 0 WHERE id = -1 "));
+    }
+
+    public function testExecWithoutAffectedRows(): void
+    {
+        $this->assertEquals(0, self::$db->exec(" UPDATE TABLEV2 SET id = -2 WHERE id = -1 "));
+    }
+
+    public function testExecute(): void
+    {
+        $this->assertTrue(self::$db->execute(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 1)]));
     }
 
     public function testExistentRow(): void
@@ -101,7 +112,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMultipleRows(): void
     {
-        $this->assertEquals(1, self::$db->exec(" INSERT INTO TABLEV1 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
+        $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV1 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
         $rows = self::$db->query(" SELECT id FROM TABLEV1 ", []);
         $this->assertIsArray($rows);
         $this->assertCount(2, $rows);
@@ -131,7 +142,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
     public function testCommitTransaction(): void
     {
         if (self::$db->beginTransaction()) {
-            $this->assertEquals(1, self::$db->exec(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
+            $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
             if (self::$db->commit()) {
                 $rows = self::$db->query(" SELECT id FROM TABLEV2 WHERE id = :id ", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]);
                 $this->assertIsArray($rows);
@@ -148,7 +159,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
     public function testRollbackTransaction(): void
     {
         if (self::$db->beginTransaction()) {
-            $this->assertEquals(1, self::$db->exec(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]));
+            $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]));
             if (self::$db->rollBack()) {
                 $rows = self::$db->query(" SELECT id FROM TABLEV2 WHERE id = :id ", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]);
                 $this->assertIsArray($rows);

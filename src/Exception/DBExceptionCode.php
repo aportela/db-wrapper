@@ -14,4 +14,5 @@ enum DBExceptionCode: int
     case DATABASE_NOT_FOUND = 8;
     case INVALID_BACKUP_PATH = 9;
     case IN_TRANSACTION_CHECK = 10;
+    case EXEC = 11;
 }
