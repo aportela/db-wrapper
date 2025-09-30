@@ -41,7 +41,11 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
         file_put_contents(self::$upgradeSchemaPath, trim($upgradeSchema));
         // main object
         self::$db = new \aportela\DatabaseWrapper\DB(
-            new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter(self::$databasePath, self::$upgradeSchemaPath),
+            new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter(
+                self::$databasePath,
+                self::$upgradeSchemaPath,
+                \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_JOURNAL_WAL | \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_FOREIGN_KEYS_ON
+            ),
             new \Psr\Log\NullLogger()
         );
     }

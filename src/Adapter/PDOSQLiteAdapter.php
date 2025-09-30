@@ -4,9 +4,13 @@ namespace aportela\DatabaseWrapper\Adapter;
 
 final class PDOSQLiteAdapter extends PDOBaseAdapter
 {
+
+    const FLAGS_PRAGMA_JOURNAL_WAL = 1;
+    const FLAGS_PRAGMA_FOREIGN_KEYS_ON = 2;
+
     public ?string $databasePath;
 
-    public function __construct(string $databasePath, string $upgradeSchemaPath = "")
+    public function __construct(string $databasePath, string $upgradeSchemaPath = "", int $flags = 0)
     {
         try {
             $this->databasePath = $databasePath;
@@ -18,6 +22,12 @@ final class PDOSQLiteAdapter extends PDOBaseAdapter
                     \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
                 )
             );
+            if ($flags & self::FLAGS_PRAGMA_JOURNAL_WAL) {
+                $this->dbh->exec("PRAGMA journal_mode = WAL;");
+            }
+            if ($flags & self::FLAGS_PRAGMA_FOREIGN_KEYS_ON) {
+                $this->dbh->exec("PRAGMA foreign_keys = ON;");
+            }
             $this->schema = new \aportela\DatabaseWrapper\Schema\PDOSQLiteSchema(
                 $upgradeSchemaPath,
                 \aportela\DatabaseWrapper\Schema\PDOSQLiteSchema::INSTALL_QUERIES,
