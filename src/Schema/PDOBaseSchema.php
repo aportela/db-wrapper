@@ -48,7 +48,12 @@ class PDOBaseSchema implements InterfaceSchema
     {
         if (!empty($this->upgradeSchemaPath)) {
             if (file_exists($this->upgradeSchemaPath)) {
-                return (include $this->upgradeSchemaPath);
+                $queries = include $this->upgradeSchemaPath;
+                if (is_array($queries)) {
+                    return $queries;
+                } else {
+                    throw new \Exception("Invalid schema file (not array) at " . $this->upgradeSchemaPath);
+                }
             } else {
                 throw new \Exception("Upgrade database schema file not found at " . $this->upgradeSchemaPath);
             }
