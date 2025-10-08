@@ -166,7 +166,7 @@ final class DB
         if ($success) {
             $installed = false;
             try {
-                foreach ($this->adapter->schema->getInstallQueries() as $query) {
+                foreach ($this->adapter->getSchema()->getInstallQueries() as $query) {
                     $this->exec($query);
                 }
                 $installed = true;
@@ -195,7 +195,7 @@ final class DB
     public function getCurrentSchemaVersion(): int
     {
         $this->logger->info("DatabaseWrapper::getCurrentSchemaVersion");
-        $results = $this->query($this->adapter->schema->getLastVersionQuery());
+        $results = $this->query($this->adapter->getSchema()->getLastVersionQuery());
         if (count($results) == 1) {
             return ($results[0]->release_number);
         } else {
@@ -207,7 +207,7 @@ final class DB
     {
         $this->logger->info("DatabaseWrapper::getUpgradeSchemaVersion");
         $lastVersion = -1;
-        foreach ($this->adapter->schema->getUpgradeQueries() as $version => $queries) {
+        foreach ($this->adapter->getSchema()->getUpgradeQueries() as $version => $queries) {
             if ($version > $lastVersion) {
                 $lastVersion = $version;
             }
@@ -218,7 +218,7 @@ final class DB
     public function upgradeSchema(bool $backup = true): int
     {
         $this->logger->info("DatabaseWrapper::upgradeSchema");
-        $results = $this->query($this->adapter->schema->getLastVersionQuery());
+        $results = $this->query($this->adapter->getSchema()->getLastVersionQuery());
         if (count($results) == 1) {
             if ($backup && $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
                 $this->adapter->backup("");
@@ -239,13 +239,13 @@ final class DB
                 $success = false;
                 $currentVersion = $results[0]->release_number;
                 try {
-                    foreach ($this->adapter->schema->getUpgradeQueries() as $version => $queries) {
+                    foreach ($this->adapter->getSchema()->getUpgradeQueries() as $version => $queries) {
                         if ($version > $currentVersion) {
                             foreach ($queries as $query) {
                                 $this->exec($query);
                             }
                             $this->execute(
-                                $this->adapter->schema->getSetVersionQuery(),
+                                $this->adapter->getSchema()->getSetVersionQuery(),
                                 array(
                                     new \aportela\DatabaseWrapper\Param\IntegerParam(":release_number", $version)
                                 )

@@ -5,7 +5,12 @@ namespace aportela\DatabaseWrapper\Adapter;
 class PDOBaseAdapter implements InterfaceAdapter
 {
     protected ?\PDO $dbh;
-    public ?\aportela\DatabaseWrapper\Schema\InterfaceSchema $schema;
+    protected ?\aportela\DatabaseWrapper\Schema\InterfaceSchema $schema;
+
+    public function getSchema(): ?\aportela\DatabaseWrapper\Schema\InterfaceSchema
+    {
+        return ($this->schema);
+    }
 
     public function __destruct()
     {

@@ -4,6 +4,8 @@ namespace aportela\DatabaseWrapper\Adapter;
 
 interface InterfaceAdapter
 {
+    public function getSchema(): ?\aportela\DatabaseWrapper\Schema\InterfaceSchema;
+
     public function beginTransaction(): bool;
 
     public function inTransaction(): bool;
