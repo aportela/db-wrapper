@@ -4,9 +4,8 @@ namespace aportela\DatabaseWrapper\Adapter;
 
 final class PDOSQLiteAdapter extends PDOBaseAdapter
 {
-
-    const FLAGS_PRAGMA_JOURNAL_WAL = 1;
-    const FLAGS_PRAGMA_FOREIGN_KEYS_ON = 2;
+    public const FLAGS_PRAGMA_JOURNAL_WAL = 1;
+    public const FLAGS_PRAGMA_FOREIGN_KEYS_ON = 2;
 
     public ?string $databasePath;
 
