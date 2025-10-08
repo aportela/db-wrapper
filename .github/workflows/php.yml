@@ -6,11 +6,13 @@ on:
     paths:
       - "**/*.php"
       - "composer.json"
+      - ".github/workflows/php.yml"
   pull_request:
     branches: ["master"]
     paths:
       - "**/*.php"
       - "composer.json"
+      - ".github/workflows/php.yml"
 
 permissions:
   contents: read
