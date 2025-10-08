@@ -16,7 +16,7 @@ interface InterfaceSchema
     public function getLastVersionQuery(): string;
 
     /**
-     * @return array<string>
+     *  @return array<int, array<string>>
      */
     public function getUpgradeQueries(): array;
 }

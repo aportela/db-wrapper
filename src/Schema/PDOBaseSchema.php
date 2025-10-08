@@ -42,7 +42,7 @@ class PDOBaseSchema implements InterfaceSchema
     }
 
     /**
-     * @return array<string>
+     *  @return array<int, array<string>>
      */
     public function getUpgradeQueries(): array
     {
