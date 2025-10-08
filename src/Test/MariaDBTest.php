@@ -220,6 +220,11 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
     }
     */
 
+    public function testGetAdapterType(): void
+    {
+        $this->assertEquals(self::$db->getAdapterType(), \aportela\DatabaseWrapper\Adapter\AdapterType::PDO_MariaDB);
+    }
+
     // this needs to be the final test
     public function testCloseAtEnd(): void
     {

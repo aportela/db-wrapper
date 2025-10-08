@@ -289,4 +289,22 @@ final class DB
             throw new \aportela\DatabaseWrapper\Exception\DBException("DB::backup FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_ADAPTER->value);
         }
     }
+
+    public function getAdapterType(): \aportela\DatabaseWrapper\Adapter\AdapterType
+    {
+        if ($this->adapter !== null) {
+            switch (get_class($this->adapter)) {
+                case "aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter":
+                    return \aportela\DatabaseWrapper\Adapter\AdapterType::PDO_MariaDB;
+                case "aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter":
+                    return \aportela\DatabaseWrapper\Adapter\AdapterType::PDO_PostgreSQL;
+                case "aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter":
+                    return \aportela\DatabaseWrapper\Adapter\AdapterType::PDO_SQLite;
+                default:
+                    return \aportela\DatabaseWrapper\Adapter\AdapterType::NONE;
+            }
+        } else {
+            return \aportela\DatabaseWrapper\Adapter\AdapterType::NONE;
+        }
+    }
 }

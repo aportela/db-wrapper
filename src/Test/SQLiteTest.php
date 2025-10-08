@@ -193,6 +193,11 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
         self::$db->backup(sys_get_temp_dir() . uniqid() . DIRECTORY_SEPARATOR . uniqid() . DIRECTORY_SEPARATOR . uniqid() . DIRECTORY_SEPARATOR);
     }
 
+    public function testGetAdapterType(): void
+    {
+        $this->assertEquals(self::$db->getAdapterType(), \aportela\DatabaseWrapper\Adapter\AdapterType::PDO_SQLite);
+    }
+
     // this needs to be the final test
     public function testCloseAtEnd(): void
     {
