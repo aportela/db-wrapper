@@ -11,9 +11,9 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
 {
     protected static ?\aportela\DatabaseWrapper\DB $db;
 
-    private static ?string $host;
-    private static ?int $port;
-    private static ?string $dbName;
+    private static string $host;
+    private static int $port;
+    private static string $dbName;
     private static ?string $username;
     private static ?string $password;
     private static string $upgradeSchemaPath;
@@ -21,9 +21,21 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        self::$host = getenv('PGSQL_HOST', true) ? getenv('PGSQL_HOST') : null;
-        self::$port = getenv('PGSQL_PORT', true) ? getenv('PGSQL_PORT') : \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter::DEFAULT_PORT;
-        self::$dbName = getenv('PGSQL_DBNAME', true) ? getenv('PGSQL_DBNAME') : null;
+        if (getenv('PGSQL_HOST', true) !== false) {
+            self::$host = getenv('PGSQL_HOST');
+        } else {
+            self::markTestSkipped('Missing environment var PGSQL_HOST');
+        }
+        if (getenv('PGSQL_PORT', true) !== false && is_numeric(getenv('PGSQL_PORT', true))) {
+            self::$port = intval(getenv('PGSQL_PORT'));
+        } else {
+            self::$port = \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter::DEFAULT_PORT;
+        }
+        if (getenv('PGSQL_DBNAME', true) !== false) {
+            self::$dbName = getenv('PGSQL_DBNAME');
+        } else {
+            self::markTestSkipped('Missing environment var PGSQL_DBNAME');
+        }
         self::$username = getenv('PGSQL_USERNAME', true) ? getenv('PGSQL_USERNAME') : null;
         self::$password = getenv('PGSQL_PASSWORD', true) ? getenv('PGSQL_PASSWORD') : null;
         self::$upgradeSchemaPath = tempnam(sys_get_temp_dir(), 'sql');
@@ -126,7 +138,6 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
     public function testExistentRow(): void
     {
         $rows = self::$db->query(' SELECT id FROM "TABLEV1" WHERE id = :id ', [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 1)]);
-        $this->assertIsArray($rows);
         $this->assertCount(1, $rows);
         $this->assertEquals(1, $rows[0]->id);
     }
@@ -135,7 +146,6 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals(1, self::$db->execute(' INSERT INTO "TABLEV1" (id) VALUES(:id)', [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
         $rows = self::$db->query(' SELECT id FROM "TABLEV1" ', []);
-        $this->assertIsArray($rows);
         $this->assertCount(2, $rows);
         $this->assertEquals(1, $rows[0]->id);
         $this->assertEquals(2, $rows[1]->id);
@@ -166,7 +176,6 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals(1, self::$db->execute(' INSERT INTO "TABLEV2" (id) VALUES(:id) ', [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
             if (self::$db->commit()) {
                 $rows = self::$db->query(' SELECT id FROM "TABLEV2" WHERE id = :id ', [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]);
-                $this->assertIsArray($rows);
                 $this->assertCount(1, $rows);
                 $this->assertEquals(2, $rows[0]->id);
             } else {
@@ -183,7 +192,6 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals(1, self::$db->execute(' INSERT INTO "TABLEV2" (id) VALUES(:id) ', [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]));
             if (self::$db->rollBack()) {
                 $rows = self::$db->query(' SELECT id FROM "TABLEV2" WHERE id = :id ', [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]);
-                $this->assertIsArray($rows);
                 $this->assertCount(0, $rows);
             } else {
                 $this->fail('rollBack failed');

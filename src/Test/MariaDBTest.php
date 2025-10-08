@@ -11,9 +11,9 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
 {
     protected static ?\aportela\DatabaseWrapper\DB $db;
 
-    private static ?string $host;
-    private static ?int $port;
-    private static ?string $dbName;
+    private static string $host;
+    private static int $port;
+    private static string $dbName;
     private static ?string $username;
     private static ?string $password;
     private static string $upgradeSchemaPath;
@@ -21,9 +21,21 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        self::$host = getenv('MARIADB_HOST', true) ? getenv('MARIADB_HOST') : null;
-        self::$port = getenv('MARIADB_PORT', true) ? getenv('MARIADB_PORT') : \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter::DEFAULT_PORT;
-        self::$dbName = getenv('MARIADB_DBNAME', true) ? getenv('MARIADB_DBNAME') : null;
+        if (getenv('MARIADB_HOST', true) !== false) {
+            self::$host = getenv('MARIADB_HOST');
+        } else {
+            self::markTestSkipped('Missing environment var MARIADB_HOST');
+        }
+        if (getenv('MARIADB_PORT', true) !== false && is_numeric(getenv('MARIADB_PORT', true))) {
+            self::$port = intval(getenv('MARIADB_PORT'));
+        } else {
+            self::$port = \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter::DEFAULT_PORT;
+        }
+        if (getenv('MARIADB_DBNAME', true) !== false) {
+            self::$dbName = getenv('MARIADB_DBNAME');
+        } else {
+            self::markTestSkipped('Missing environment var MARIADB_DBNAME');
+        }
         self::$username = getenv('MARIADB_USERNAME', true) ? getenv('MARIADB_USERNAME') : null;
         self::$password = getenv('MARIADB_PASSWORD', true) ? getenv('MARIADB_PASSWORD') : null;
         self::$upgradeSchemaPath = tempnam(sys_get_temp_dir(), 'sql');
@@ -121,7 +133,6 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
     public function testExistentRow(): void
     {
         $rows = self::$db->query(" SELECT id FROM TABLEV1 WHERE id = :id ", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 1)]);
-        $this->assertIsArray($rows);
         $this->assertCount(1, $rows);
         $this->assertEquals(1, $rows[0]->id);
     }
@@ -130,7 +141,6 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV1 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
         $rows = self::$db->query(" SELECT id FROM TABLEV1 ", []);
-        $this->assertIsArray($rows);
         $this->assertCount(2, $rows);
         $this->assertEquals(1, $rows[0]->id);
         $this->assertEquals(2, $rows[1]->id);
@@ -161,7 +171,6 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
             if (self::$db->commit()) {
                 $rows = self::$db->query(" SELECT id FROM TABLEV2 WHERE id = :id ", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]);
-                $this->assertIsArray($rows);
                 $this->assertCount(1, $rows);
                 $this->assertEquals(2, $rows[0]->id);
             } else {
@@ -178,7 +187,6 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]));
             if (self::$db->rollBack()) {
                 $rows = self::$db->query(" SELECT id FROM TABLEV2 WHERE id = :id ", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]);
-                $this->assertIsArray($rows);
                 $this->assertCount(0, $rows);
             } else {
                 $this->fail('rollBack failed');
