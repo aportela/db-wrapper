@@ -109,7 +109,6 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
     public function testExistentRow(): void
     {
         $rows = self::$db->query(" SELECT id FROM TABLEV1 WHERE id = :id ", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 1)]);
-        $this->assertIsArray($rows);
         $this->assertCount(1, $rows);
         $this->assertEquals(1, $rows[0]->id);
     }
@@ -118,7 +117,6 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV1 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
         $rows = self::$db->query(" SELECT id FROM TABLEV1 ", []);
-        $this->assertIsArray($rows);
         $this->assertCount(2, $rows);
         $this->assertEquals(1, $rows[0]->id);
         $this->assertEquals(2, $rows[1]->id);
@@ -149,7 +147,6 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
             if (self::$db->commit()) {
                 $rows = self::$db->query(" SELECT id FROM TABLEV2 WHERE id = :id ", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]);
-                $this->assertIsArray($rows);
                 $this->assertCount(1, $rows);
                 $this->assertEquals(2, $rows[0]->id);
             } else {
@@ -166,7 +163,6 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV2 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]));
             if (self::$db->rollBack()) {
                 $rows = self::$db->query(" SELECT id FROM TABLEV2 WHERE id = :id ", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]);
-                $this->assertIsArray($rows);
                 $this->assertCount(0, $rows);
             } else {
                 $this->fail('rollBack failed');
