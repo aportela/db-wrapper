@@ -3,8 +3,14 @@ name: PHP Composer
 on:
   push:
     branches: ["master"]
+    paths:
+      - "**/*.php"
+      - "composer.json"
   pull_request:
     branches: ["master"]
+    paths:
+      - "**/*.php"
+      - "composer.json"
 
 permissions:
   contents: read
