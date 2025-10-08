@@ -16,7 +16,7 @@ At this time only SQLite, MariaDB/MySQL, PostgreSQL adapters are supported.
 composer require "aportela/db-wrapper"
 ```
 
-# install / initializate database example
+# install / initializate (SQLite) database example
 
 ```php
 <?php
@@ -26,8 +26,17 @@ composer require "aportela/db-wrapper"
     (
         "database" => array
         (
+            // SQLite settings (filename & path)
             "filename" => "test.db",
             "path" => __DIR__ . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR
+            // custom extra settings for other adapters (MariaDB/PostgreSQL)
+            /*
+            "host" => "127.0.0.1",
+            "port" = > 3306,
+            "username" => "foo",
+            "password" => "bar",
+            "db"=> "mydb"
+            */
         ),
         /* uncoment next setting & comment NullLogger constructor if you want file logs with (my) custom rotating handler*/
         /*
@@ -66,9 +75,28 @@ composer require "aportela/db-wrapper"
     // null logger (monolog) definition
     $logger = new \Psr\Log\NullLogger("");
 
-    // we are using PDO sqlite adapter (only available at this time)
-    $adapter = new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter($settings["database"]["path"] . $settings["database"]["filename"]);
-
+    // we are using PDO sqlite adapter
+    $adapter = new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter(
+        $settings["database"]["path"] . $settings["database"]["filename"]
+    );
+    /*
+    // MariaDB adapter
+    $adapter = new \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter(
+        $settings["database"]["host"],
+        $settings["database"]["port"],
+        $settings["database"]["db"],
+        $settings["database"]["username"],
+        $settings["database"]["password"]
+    );
+    // PostgreSQL adapter
+    $adapter = new \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter(
+        $settings["database"]["host"],
+        $settings["database"]["port"],
+        $settings["database"]["db"],
+        $settings["database"]["username"],
+        $settings["database"]["password"]
+    );
+    */
     // main object
     $db = new \aportela\DatabaseWrapper\DB
     (
@@ -108,7 +136,7 @@ composer require "aportela/db-wrapper"
 ?>
 ```
 
-# upgrade schema & exec some queries
+# upgrade (SQLite) schema & exec some queries
 
 ```php
 <?php
@@ -118,9 +146,18 @@ composer require "aportela/db-wrapper"
         (
         "database" => array
         (
+            // SQLite settings (filename & path)
             "filename" => "test.db",
             "path" => __DIR__ . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR,
             "upgradeSchemaPath" => __DIR__ . DIRECTORY_SEPARATOR . "upgrade.sql"
+            // custom extra settings for other adapters (MariaDB/PostgreSQL)
+            /*
+            "host" => "127.0.0.1",
+            "port" = > 3306,
+            "username" => "foo",
+            "password" => "bar",
+            "db"=> "mydb"
+            */
         ),
         /* uncoment next setting & comment NullLogger constructor if you want file logs with (my) custom rotating handler*/
         /*
@@ -164,7 +201,7 @@ composer require "aportela/db-wrapper"
     // null logger (monolog) definition
     $logger = new \Psr\Log\NullLogger("");
 
-    // we are using PDO sqlite adapter (only available at this time), also set the upgrade scheme (point to a local file)
+    // we are using PDO sqlite adapter, also set the upgrade scheme (point to a local file)
     $adapter = new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter(
         $settings["database"]["path"] . $settings["database"]["filename"],
         // READ upgrade SQL schema file definition on next block of this README.md
@@ -172,6 +209,27 @@ composer require "aportela/db-wrapper"
         // optional param, bitmask to set "PRAGMA journal_mode = WAL" && "PRAGMA foreign_keys = ON"
         \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_JOURNAL_WAL | \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_FOREIGN_KEYS_ON
     );
+
+    /*
+    // MariaDB adapter
+    $adapter = new \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter(
+        $settings["database"]["host"],
+        $settings["database"]["port"],
+        $settings["database"]["db"],
+        $settings["database"]["username"],
+        $settings["database"]["password"],
+        $settings["database"]["upgradeSchemaPath"]
+    );
+    // PostgreSQL adapter
+    $adapter = new \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter(
+        $settings["database"]["host"],
+        $settings["database"]["port"],
+        $settings["database"]["db"],
+        $settings["database"]["username"],
+        $settings["database"]["password"],
+        $settings["database"]["upgradeSchemaPath"]
+    );
+    */
 
     // main object
     $db = new \aportela\DatabaseWrapper\DB
