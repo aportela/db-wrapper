@@ -4,7 +4,7 @@ Custom php PDO database wrapper
 
 ## Requirements
 
-- mininum php version 8.x
+- mininum php version 8.4
 
 ## Limitations
 
