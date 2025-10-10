@@ -12,7 +12,7 @@ At this time only SQLite, MariaDB/MySQL, PostgreSQL adapters are supported.
 
 # install
 
-```
+```Shell
 composer require "aportela/db-wrapper"
 ```
 
