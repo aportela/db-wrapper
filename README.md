@@ -244,17 +244,45 @@ composer require "aportela/db-wrapper"
     {
         echo sprintf("Database upgrade success, current version: %s%s", $currentVersion, PHP_EOL);
         $db->query(" CREATE TABLE IF NOT EXISTS MYTABLE (id INTEGER PRIMARY KEY, name VARCHAR(32)); ");
-        $db->query(" INSERT INTO MYTABLE (name) VALUES (:name); ",
-            array
-            (
+        $db->query(" INSERT INTO MYTABLE (id, name) VALUES (:id, :name); ",
+            [
+                new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 1),
                 new \aportela\DatabaseWrapper\Param\StringParam(":name", "foobar-" .uniqid())
-            )
+            ]
         );
 
         $results = $db->query(" SELECT id, name FROM MYTABLE ORDER BY id DESC LIMIT 1 ");
         if (is_array($results) && count($results) == 1)
         {
             echo sprintf("Last row was id: %s - name: %s%s", $results[0]->id, $results[0]->name, PHP_EOL);
+        }
+        else
+        {
+            echo sprintf("SQL error, check logs (at %s)%s", $settings["logger"]["path"], PHP_EOL);
+        }
+
+        // after query custom function example for "parsing" rows
+        $afterQueryFunction = function ($rows) {
+            array_map(
+                function ($item) {
+                    // duplicate name property into new customField
+                    $item->customField = $item->name;
+                    return ($item);
+                },
+                $rows
+            );
+        };
+        // use custom params && (optional) after query function
+        $results = $db->query(
+            " SELECT id, name FROM MYTABLE WHERE id > :id ORDER BY id DESC LIMIT 1 ",
+            [
+                new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 0),
+            ],
+            $afterQueryFunction
+        );
+        if (is_array($results) && count($results) == 1)
+        {
+            echo sprintf("Last row was id: %s - name: %s - customField: $%s%s", $results[0]->id, $results[0]->name, $results[0]->customField, PHP_EOL);
         }
         else
         {

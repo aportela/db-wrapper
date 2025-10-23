@@ -146,6 +146,29 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $rows[1]->id);
     }
 
+    public function testGetMultipleRowsWithAfterQueryFunction(): void
+    {
+        $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV1 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]));
+        $afterQueryFunction = function ($rows) {
+            array_map(
+                function ($item) {
+                    $item->id = intval($item->id);
+                    $item->negativeId = $item->id * -1;
+                    return ($item);
+                },
+                $rows
+            );
+        };
+        $rows = self::$db->query(" SELECT id FROM TABLEV1 ", [], $afterQueryFunction);
+        $this->assertCount(3, $rows);
+        $this->assertEquals(1, $rows[0]->id);
+        $this->assertEquals(2, $rows[1]->id);
+        $this->assertEquals(3, $rows[2]->id);
+        $this->assertEquals(-1, $rows[0]->negativeId);
+        $this->assertEquals(-2, $rows[1]->negativeId);
+        $this->assertEquals(-3, $rows[2]->negativeId);
+    }
+
     public function testInTransactionWithTransaction(): void
     {
         if (self::$db->beginTransaction()) {

@@ -123,12 +123,15 @@ final class DB
      * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
      * @return array<Object>
      */
-    public function query(string $query, array $params = array()): array
+    public function query(string $query, array $params = array(), ?callable $afterQueryFunction = null): array
     {
         $this->logger->debug("DatabaseWrapper::query", array("SQL" => $this->parseQuery($query, $params)));
         $rows = array();
         try {
             $rows = $this->adapter->query($query, $params);
+            if ($afterQueryFunction != null) {
+                call_user_func($afterQueryFunction, $rows);
+            }
         } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
             $this->logger->error("DatabaseWrapper::query FAILED", array($params, "ERROR" => $e->getPrevious()->getMessage()));
             throw $e;
