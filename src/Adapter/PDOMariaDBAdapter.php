@@ -39,6 +39,6 @@ final class PDOMariaDBAdapter extends PDOBaseAdapter
                 new \aportela\DatabaseWrapper\Param\StringParam(":tableName", "VERSION"),
             ]
         );
-        return (count($results) == 1 && $results[0]->table_count == 1);
+        return (count($results) == 1 && isset($results[0]->table_count) && $results[0]->table_count == 1);
     }
 }

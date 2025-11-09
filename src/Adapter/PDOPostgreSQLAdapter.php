@@ -28,6 +28,6 @@ final class PDOPostgreSQLAdapter extends PDOBaseAdapter
     public function isSchemaInstalled(): bool
     {
         $results = $this->query(" SELECT COUNT(relname) AS table_count FROM pg_class WHERE relname = 'VERSION'; ");
-        return (count($results) == 1 && $results[0]->table_count == 1);
+        return (count($results) == 1 && isset($results[0]->table_count) && $results[0]->table_count == 1);
     }
 }

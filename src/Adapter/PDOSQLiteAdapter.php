@@ -41,7 +41,7 @@ final class PDOSQLiteAdapter extends PDOBaseAdapter
     public function isSchemaInstalled(): bool
     {
         $results = $this->query(" SELECT COUNT(name) AS table_count FROM sqlite_master WHERE type='table' AND name='VERSION'; ");
-        return (count($results) == 1 && $results[0]->table_count == 1);
+        return (count($results) == 1 && isset($results[0]->table_count) && $results[0]->table_count == 1);
     }
 
     public function backup(string $path): string
