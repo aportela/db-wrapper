@@ -61,7 +61,7 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
         return ($success);
     }
 
-    public function exec(string $query): int
+    public function exec(string $query): int|false
     {
         $affectedRows = 0;
         try {

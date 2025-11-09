@@ -14,7 +14,7 @@ interface InterfaceAdapter
 
     public function rollBack(): bool;
 
-    public function exec(string $query): int;
+    public function exec(string $query): int|false;
 
     /**
      * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
