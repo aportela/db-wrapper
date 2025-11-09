@@ -28,7 +28,7 @@ final class DB
                 throw $e;
             }
         }
-        
+
         return ($activeTransaction);
     }
 
@@ -44,7 +44,7 @@ final class DB
                 throw $e;
             }
         }
-        
+
         return ($success);
     }
 
@@ -60,7 +60,7 @@ final class DB
                 throw $e;
             }
         }
-        
+
         return ($success);
     }
 
@@ -76,7 +76,7 @@ final class DB
                 throw $e;
             }
         }
-        
+
         return ($success);
     }
 
@@ -89,10 +89,10 @@ final class DB
             if ($param::class == "aportela\DatabaseWrapper\Param\StringParam") {
                 $query = str_replace($param->getName(), "'" . ($param->getValue() ?? "") . "'", $query);
             } else {
-                $query = str_replace($param->getName(), $param->getValue() ?? "", $query);
+                $query = str_replace($param->getName(), strval($param->getValue() ?? ""), $query);
             }
         }
-        
+
         $expression = '/[\r\n\t]/';
         $query = preg_replace($expression, " ", $query);
         $expression = '/\s+/';
@@ -112,7 +112,7 @@ final class DB
                 $this->logger->error("DatabaseWrapper::exec FAILED", ["ERROR" => $previousException instanceof \Throwable ? $previousException->getMessage() : $e->getMessage()]);
                 throw $e;
             }
-            
+
             return ($rowCount);
         } else {
             return (false);
@@ -135,7 +135,7 @@ final class DB
                 throw $e;
             }
         }
-        
+
         return ($success);
     }
 
@@ -160,7 +160,7 @@ final class DB
                 throw $e;
             }
         }
-        
+
         return ($rows);
     }
 
@@ -197,14 +197,14 @@ final class DB
         } else {
             throw new \aportela\DatabaseWrapper\Exception\DBException("DB::isSchemaInstalled FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_ADAPTER->value);
         }
-        
+
         if ($success) {
             $installed = false;
             try {
                 foreach ($this->interfaceAdapter->getSchema()->getInstallQueries() as $query) {
                     $this->exec($query);
                 }
-                
+
                 $installed = true;
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                 $this->logger->error("DatabaseWrapper::installSchema", [$e->getMessage()]);
@@ -213,17 +213,17 @@ final class DB
                     if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                         $this->commit();
                     }
-                    
+
                     $this->logger->info("DatabaseWrapper::installSchema SUCCESS");
                 } else {
                     if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                         $this->rollback();
                     }
-                    
+
                     $this->logger->emergency("DatabaseWrapper::installSchema FAILED");
                 }
             }
-            
+
             return ($installed);
         } else {
             $this->logger->emergency("DatabaseWrapper::installSchema FAILED (ERROR OPENING TRANSACTION)");
@@ -251,7 +251,7 @@ final class DB
                 $lastVersion = $version;
             }
         }
-        
+
         return ($lastVersion);
     }
 
@@ -263,7 +263,7 @@ final class DB
             if ($backup && $this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
                 $this->interfaceAdapter->backup("");
             }
-            
+
             // allow transactions only for sqlite adapters
             // FROM php documentation:
             // Some databases, including MySQL, automatically issue an implicit COMMIT when a database definition language (DDL) statement such as DROP TABLE or CREATE TABLE is issued within a transaction.
@@ -276,7 +276,7 @@ final class DB
             } else {
                 throw new \aportela\DatabaseWrapper\Exception\DBException("DB::isSchemaInstalled FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_ADAPTER->value);
             }
-            
+
             if ($success && isset($results[0]->release_number)) {
                 $success = false;
                 $currentVersion = $results[0]->release_number;
@@ -286,7 +286,7 @@ final class DB
                             foreach ($queries as $query) {
                                 $this->exec($query);
                             }
-                            
+
                             $this->execute(
                                 $this->interfaceAdapter->getSchema()->getSetVersionQuery(),
                                 [
@@ -297,7 +297,7 @@ final class DB
                             $this->logger->info("DatabaseWrapper::upgradeSchema version upgraded to " . $currentVersion);
                         }
                     }
-                    
+
                     $success = true;
                 } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                     throw $e;
@@ -306,17 +306,17 @@ final class DB
                         if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                             $this->commit();
                         }
-                        
+
                         $this->logger->info("DatabaseWrapper::upgradeSchema SUCCESS");
                     } else {
                         if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                             $this->rollback();
                         }
-                        
+
                         $this->logger->emergency("DatabaseWrapper::upgradeSchema FAILED");
                     }
                 }
-                
+
                 return ($currentVersion);
             } else {
                 $this->logger->emergency("DatabaseWrapper::upgradeSchema FAILED (ERROR OPENING TRANSACTION)");
