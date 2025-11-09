@@ -9,7 +9,7 @@ require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "vendor" . DIRECT
 #[\PHPUnit\Framework\Attributes\RequiresPhpExtension('pdo_pgsql')]
 final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
 {
-    protected static ?\aportela\DatabaseWrapper\DB $db;
+    protected static \aportela\DatabaseWrapper\DB $db;
 
     private static string $host;
     private static int $port;
