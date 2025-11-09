@@ -4,8 +4,8 @@ namespace aportela\DatabaseWrapper\Adapter;
 
 final class PDOSQLiteAdapter extends PDOBaseAdapter
 {
-    public const FLAGS_PRAGMA_JOURNAL_WAL = 1;
-    public const FLAGS_PRAGMA_FOREIGN_KEYS_ON = 2;
+    public const int FLAGS_PRAGMA_JOURNAL_WAL = 1;
+    public const int FLAGS_PRAGMA_FOREIGN_KEYS_ON = 2;
 
     public string $databasePath;
 
@@ -17,9 +17,9 @@ final class PDOSQLiteAdapter extends PDOBaseAdapter
                 sprintf("sqlite:%s", $databasePath),
                 null,
                 null,
-                array(
+                [
                     \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
-                )
+                ]
             );
             if ($flags & self::FLAGS_PRAGMA_JOURNAL_WAL) {
                 $this->dbh->exec("PRAGMA journal_mode = WAL;");
@@ -38,6 +38,7 @@ final class PDOSQLiteAdapter extends PDOBaseAdapter
         }
     }
 
+    #[\Override]
     public function isSchemaInstalled(): bool
     {
         $results = $this->query(" SELECT COUNT(name) AS table_count FROM sqlite_master WHERE type='table' AND name='VERSION'; ");

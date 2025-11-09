@@ -4,23 +4,11 @@ namespace aportela\DatabaseWrapper\Schema;
 
 abstract class PDOBaseSchema implements InterfaceSchema
 {
-    protected string $upgradeSchemaPath;
-    /**
-     * @var array<string> $installQueries
-     */
-    protected array $installQueries;
-    protected string $setCurrentVersionQuery;
-    protected string $getCurrentVersionQuery;
-
     /**
      * @param array<string> $installQueries
      */
-    public function __construct(string $upgradeSchemaPath = "", array $installQueries = [], string $setCurrentVersionQuery = "", string $getCurrentVersionQuery = "")
+    public function __construct(protected string $upgradeSchemaPath = "", protected array $installQueries = [], protected string $setCurrentVersionQuery = "", protected string $getCurrentVersionQuery = "")
     {
-        $this->upgradeSchemaPath = $upgradeSchemaPath;
-        $this->installQueries = $installQueries;
-        $this->setCurrentVersionQuery = $setCurrentVersionQuery;
-        $this->getCurrentVersionQuery = $getCurrentVersionQuery;
     }
 
     /**
@@ -58,7 +46,7 @@ abstract class PDOBaseSchema implements InterfaceSchema
                 throw new \Exception("Upgrade database schema file not found at " . $this->upgradeSchemaPath);
             }
         } else {
-            return (array());
+            return ([]);
         }
     }
 }

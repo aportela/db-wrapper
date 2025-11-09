@@ -19,13 +19,13 @@ interface InterfaceAdapter
     /**
      * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
      */
-    public function execute(string $query, array $params = array()): bool;
+    public function execute(string $query, array $params = []): bool;
 
     /**
      * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
      * @return array<Object>
      */
-    public function query(string $query, array $params = array()): array;
+    public function query(string $query, array $params = []): array;
 
     public function close(): void;
 

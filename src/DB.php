@@ -4,13 +4,8 @@ namespace aportela\DatabaseWrapper;
 
 final class DB
 {
-    protected ?\aportela\DatabaseWrapper\Adapter\InterfaceAdapter $adapter;
-    protected \Psr\Log\LoggerInterface $logger;
-
-    public function __construct(\aportela\DatabaseWrapper\Adapter\InterfaceAdapter $adapter, \Psr\Log\LoggerInterface $logger)
+    public function __construct(protected ?\aportela\DatabaseWrapper\Adapter\InterfaceAdapter $adapter, protected \Psr\Log\LoggerInterface $logger)
     {
-        $this->adapter = $adapter;
-        $this->logger = $logger;
         $this->logger->debug("DatabaseWrapper::__construct");
     }
 
@@ -82,10 +77,10 @@ final class DB
     /**
      * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
      */
-    private function parseQuery(string $query, $params = array()): string
+    private function parseQuery(string $query, $params = []): string
     {
         foreach ($params as $param) {
-            if (get_class($param) == "aportela\DatabaseWrapper\Param\StringParam") {
+            if ($param::class == "aportela\DatabaseWrapper\Param\StringParam") {
                 $query = str_replace($param->getName(), "'" . ($param->getValue() ?? "") . "'", $query);
             } else {
                 $query = str_replace($param->getName(), $param->getValue() ?? "", $query);
@@ -100,14 +95,14 @@ final class DB
 
     public function exec(string $query): int|false
     {
-        $this->logger->debug("DatabaseWrapper::exec", array("SQL" => $this->parseQuery($query)));
+        $this->logger->debug("DatabaseWrapper::exec", ["SQL" => $this->parseQuery($query)]);
         if ($this->adapter !== null) {
             $rowCount = 0;
             try {
                 $rowCount = $this->adapter->exec($query);
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                 $previousException = $e->getPrevious();
-                $this->logger->error("DatabaseWrapper::exec FAILED", array("ERROR" => $previousException !== null ? $previousException->getMessage() : $e->getMessage()));
+                $this->logger->error("DatabaseWrapper::exec FAILED", ["ERROR" => $previousException !== null ? $previousException->getMessage() : $e->getMessage()]);
                 throw $e;
             }
             return ($rowCount);
@@ -119,16 +114,16 @@ final class DB
     /**
      * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
      */
-    public function execute(string $query, array $params = array()): bool
+    public function execute(string $query, array $params = []): bool
     {
-        $this->logger->debug("DatabaseWrapper::execute", array("SQL" => $this->parseQuery($query, $params)));
+        $this->logger->debug("DatabaseWrapper::execute", ["SQL" => $this->parseQuery($query, $params)]);
         $success = false;
         if ($this->adapter !== null) {
             try {
                 $success = $this->adapter->execute($query, $params);
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                 $previousException = $e->getPrevious();
-                $this->logger->error("DatabaseWrapper::execute FAILED", array("ERROR" => $previousException !== null ? $previousException->getMessage() : $e->getMessage()));
+                $this->logger->error("DatabaseWrapper::execute FAILED", ["ERROR" => $previousException !== null ? $previousException->getMessage() : $e->getMessage()]);
                 throw $e;
             }
         }
@@ -139,10 +134,10 @@ final class DB
      * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
      * @return array<Object>
      */
-    public function query(string $query, array $params = array(), ?callable $afterQueryFunction = null): array
+    public function query(string $query, array $params = [], ?callable $afterQueryFunction = null): array
     {
-        $this->logger->debug("DatabaseWrapper::query", array("SQL" => $this->parseQuery($query, $params)));
-        $rows = array();
+        $this->logger->debug("DatabaseWrapper::query", ["SQL" => $this->parseQuery($query, $params)]);
+        $rows = [];
         // TODO: change return types to array|false ?
         if ($this->adapter !== null) {
             try {
@@ -152,7 +147,7 @@ final class DB
                 }
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                 $previousException = $e->getPrevious();
-                $this->logger->error("DatabaseWrapper::query FAILED", array("ERROR" => $previousException !== null ? $previousException->getMessage() : $e->getMessage()));
+                $this->logger->error("DatabaseWrapper::query FAILED", ["ERROR" => $previousException !== null ? $previousException->getMessage() : $e->getMessage()]);
                 throw $e;
             }
         }
@@ -275,9 +270,9 @@ final class DB
                             }
                             $this->execute(
                                 $this->adapter->getSchema()->getSetVersionQuery(),
-                                array(
+                                [
                                     new \aportela\DatabaseWrapper\Param\IntegerParam(":release_number", $version)
-                                )
+                                ]
                             );
                             $currentVersion = $version;
                             $this->logger->info("DatabaseWrapper::upgradeSchema version upgraded to " . $currentVersion);
@@ -322,7 +317,7 @@ final class DB
     public function getAdapterType(): \aportela\DatabaseWrapper\Adapter\AdapterType
     {
         if ($this->adapter !== null) {
-            switch (get_class($this->adapter)) {
+            switch ($this->adapter::class) {
                 case "aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter":
                     return \aportela\DatabaseWrapper\Adapter\AdapterType::PDO_MariaDB;
                 case "aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter":

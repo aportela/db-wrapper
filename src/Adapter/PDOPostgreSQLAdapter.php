@@ -4,7 +4,7 @@ namespace aportela\DatabaseWrapper\Adapter;
 
 final class PDOPostgreSQLAdapter extends PDOBaseAdapter
 {
-    public const DEFAULT_PORT = 5432;
+    public const int DEFAULT_PORT = 5432;
     public ?string $dbName;
 
     public function __construct(string $host, int $port, string $dbName, string $username, string $password, string $upgradeSchemaPath = "")
@@ -25,6 +25,7 @@ final class PDOPostgreSQLAdapter extends PDOBaseAdapter
         }
     }
 
+    #[\Override]
     public function isSchemaInstalled(): bool
     {
         $results = $this->query(" SELECT COUNT(relname) AS table_count FROM pg_class WHERE relname = 'VERSION'; ");

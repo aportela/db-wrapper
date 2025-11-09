@@ -5,7 +5,7 @@ namespace aportela\DatabaseWrapper\Adapter;
 abstract class PDOBaseAdapter implements InterfaceAdapter
 {
     protected ?\PDO $dbh = null;
-    protected ?\aportela\DatabaseWrapper\Schema\InterfaceSchema $schema;
+    protected ?\aportela\DatabaseWrapper\Schema\InterfaceSchema $schema = null;
 
     public function getSchema(): ?\aportela\DatabaseWrapper\Schema\InterfaceSchema
     {
@@ -87,7 +87,7 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
     /**
      * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
      */
-    public function execute(string $query, array $params = array()): bool
+    public function execute(string $query, array $params = []): bool
     {
         $success = false;
         if ($this->dbh !== null) {
@@ -96,7 +96,7 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
                 $totalParams = count($params);
                 if ($totalParams > 0) {
                     for ($i = 0; $i < $totalParams; $i++) {
-                        switch (get_class($params[$i])) {
+                        switch ($params[$i]::class) {
                             case "aportela\DatabaseWrapper\Param\NullParam":
                                 $stmt->bindValue($params[$i]->getName(), null, \PDO::PARAM_NULL);
                                 break;
@@ -127,9 +127,9 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
      * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
      * @return array<Object>
      */
-    public function query(string $query, array $params = array()): array
+    public function query(string $query, array $params = []): array
     {
-        $rows = array();
+        $rows = [];
         // TODO: change return types to array|false ?
         if ($this->dbh !== null) {
             try {
@@ -137,7 +137,7 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
                 $totalParams = count($params);
                 if ($totalParams > 0) {
                     for ($i = 0; $i < $totalParams; $i++) {
-                        switch (get_class($params[$i])) {
+                        switch ($params[$i]::class) {
                             case "aportela\DatabaseWrapper\Param\NullParam":
                                 $stmt->bindValue($params[$i]->getName(), null, \PDO::PARAM_NULL);
                                 break;
@@ -156,7 +156,7 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
                         }
                     }
                 }
-                $rows = array();
+                $rows = [];
                 if ($stmt->execute()) {
                     while ($row = $stmt->fetchObject()) {
                         $rows[] = $row;

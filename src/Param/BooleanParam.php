@@ -4,12 +4,10 @@ namespace aportela\DatabaseWrapper\Param;
 
 final class BooleanParam implements InterfaceParam
 {
-    private string $name;
     private bool $value;
 
-    public function __construct(string $name, mixed $value)
+    public function __construct(private readonly string $name, mixed $value)
     {
-        $this->name = $name;
         if (is_bool($value)) {
             $this->value = $value;
         } else {

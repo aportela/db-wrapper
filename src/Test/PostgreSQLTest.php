@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace aportela\DatabaseWrapper\Test;
 
-require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php";
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php";
 
 #[\PHPUnit\Framework\Attributes\RequiresPhpExtension('pdo_pgsql')]
 final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
