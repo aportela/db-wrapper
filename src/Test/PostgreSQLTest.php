@@ -21,23 +21,28 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        if (getenv('PGSQL_HOST', true) !== false) {
-            self::$host = getenv('PGSQL_HOST');
+        $host = getenv('PGSQL_HOST', true);
+        if (is_string($host)) {
+            self::$host = $host;
         } else {
             self::markTestSkipped('Missing environment var PGSQL_HOST');
         }
-        if (getenv('PGSQL_PORT', true) !== false && is_numeric(getenv('PGSQL_PORT', true))) {
-            self::$port = intval(getenv('PGSQL_PORT'));
+        $port = getenv('PGSQL_PORT', true);
+        if (is_numeric($port)) {
+            self::$port = intval($port);
         } else {
             self::$port = \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter::DEFAULT_PORT;
         }
-        if (getenv('PGSQL_DBNAME', true) !== false) {
-            self::$dbName = getenv('PGSQL_DBNAME');
+        $dbName = getenv('PGSQL_DBNAME', true);
+        if (is_string($dbName)) {
+            self::$dbName = $dbName;
         } else {
             self::markTestSkipped('Missing environment var PGSQL_DBNAME');
         }
-        self::$username = getenv('PGSQL_USERNAME', true) ? getenv('PGSQL_USERNAME') : null;
-        self::$password = getenv('PGSQL_PASSWORD', true) ? getenv('PGSQL_PASSWORD') : null;
+        $username = getenv('PGSQL_USERNAME', true);
+        self::$username = is_string($username) ? $username : null;
+        $password = getenv('PGSQL_PASSWORD', true);
+        self::$password = is_string($password) ? $password : null;
         self::$upgradeSchemaPath = tempnam(sys_get_temp_dir(), 'sql');
         $upgradeSchema = '
             <?php

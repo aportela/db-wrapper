@@ -21,23 +21,28 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        if (getenv('MARIADB_HOST', true) !== false) {
-            self::$host = getenv('MARIADB_HOST');
+        $host = getenv('MARIADB_HOST', true);
+        if (is_string($host)) {
+            self::$host = $host;
         } else {
             self::markTestSkipped('Missing environment var MARIADB_HOST');
         }
-        if (getenv('MARIADB_PORT', true) !== false && is_numeric(getenv('MARIADB_PORT', true))) {
-            self::$port = intval(getenv('MARIADB_PORT'));
+        $port = getenv('MARIADB_PORT', true);
+        if (is_numeric($port)) {
+            self::$port = intval($port);
         } else {
             self::$port = \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter::DEFAULT_PORT;
         }
-        if (getenv('MARIADB_DBNAME', true) !== false) {
-            self::$dbName = getenv('MARIADB_DBNAME');
+        $dbName = getenv('MARIADB_DBNAME', true);
+        if (is_string($dbName)) {
+            self::$dbName = $dbName;
         } else {
             self::markTestSkipped('Missing environment var MARIADB_DBNAME');
         }
-        self::$username = getenv('MARIADB_USERNAME', true) ? getenv('MARIADB_USERNAME') : null;
-        self::$password = getenv('MARIADB_PASSWORD', true) ? getenv('MARIADB_PASSWORD') : null;
+        $username = getenv('MARIADB_USERNAME', true);
+        self::$username = is_string($username) ? $username : null;
+        $password = getenv('MARIADB_PASSWORD', true);
+        self::$password = is_string($password) ? $password : null;
         self::$upgradeSchemaPath = tempnam(sys_get_temp_dir(), 'sql');
         $upgradeSchema = "
             <?php
