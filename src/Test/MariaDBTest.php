@@ -14,8 +14,8 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
     private static string $host;
     private static int $port;
     private static string $dbName;
-    private static ?string $username;
-    private static ?string $password;
+    private static string $username;
+    private static string $password;
     private static string $upgradeSchemaPath;
 
     public static function setUpBeforeClass(): void
@@ -40,9 +40,9 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
             self::markTestSkipped('Missing environment var MARIADB_DBNAME');
         }
         $username = getenv('MARIADB_USERNAME', true);
-        self::$username = is_string($username) ? $username : null;
+        self::$username = is_string($username) ? $username : "";
         $password = getenv('MARIADB_PASSWORD', true);
-        self::$password = is_string($password) ? $password : null;
+        self::$password = is_string($password) ? $password : "";
         self::$upgradeSchemaPath = tempnam(sys_get_temp_dir(), 'sql');
         $upgradeSchema = "
             <?php
@@ -96,7 +96,6 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
     public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
-        self::$db = null;
     }
 
     public function testInstall(): void
