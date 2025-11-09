@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace aportela\DatabaseWrapper\Schema;
 
 final class PDOPostgreSQLSchema extends PDOBaseSchema

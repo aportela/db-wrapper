@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace aportela\DatabaseWrapper\Adapter;
 
 final class PDOMariaDBAdapter extends PDOBaseAdapter
 {
     public const int DEFAULT_PORT = 3306;
+    
     public ?string $dbName;
 
     public function __construct(string $host, int $port, string $dbName, string $username, string $password, string $upgradeSchemaPath = "")
@@ -25,8 +28,8 @@ final class PDOMariaDBAdapter extends PDOBaseAdapter
                 \aportela\DatabaseWrapper\Schema\PDOMariaDBSchema::SET_CURRENT_VERSION_QUERY,
                 \aportela\DatabaseWrapper\Schema\PDOMariaDBSchema::GET_CURRENT_VERSION_QUERY
             );
-        } catch (\PDOException $e) {
-            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOMariaDBAdapter::__construct FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::CONSTRUCTOR->value, $e);
+        } catch (\PDOException $pdoException) {
+            throw new \aportela\DatabaseWrapper\Exception\DBException("PDOMariaDBAdapter::__construct FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::CONSTRUCTOR->value, $pdoException);
         }
     }
 
@@ -40,6 +43,6 @@ final class PDOMariaDBAdapter extends PDOBaseAdapter
                 new \aportela\DatabaseWrapper\Param\StringParam(":tableName", "VERSION"),
             ]
         );
-        return (count($results) == 1 && isset($results[0]->table_count) && $results[0]->table_count == 1);
+        return (count($results) === 1 && isset($results[0]->table_count) && $results[0]->table_count == 1);
     }
 }

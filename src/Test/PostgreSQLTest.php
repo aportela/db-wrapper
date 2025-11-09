@@ -9,13 +9,18 @@ require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SE
 #[\PHPUnit\Framework\Attributes\RequiresPhpExtension('pdo_pgsql')]
 final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
 {
-    protected static \aportela\DatabaseWrapper\DB $db;
+    private static \aportela\DatabaseWrapper\DB $db;
 
     private static string $host;
+    
     private static int $port;
+    
     private static string $dbName;
+    
     private static string $username;
+    
     private static string $password;
+    
     private static string $upgradeSchemaPath;
 
     public static function setUpBeforeClass(): void
@@ -27,22 +32,23 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
         } else {
             self::markTestSkipped('Missing environment var PGSQL_HOST');
         }
+        
         $port = getenv('PGSQL_PORT', true);
-        if (is_numeric($port)) {
-            self::$port = intval($port);
-        } else {
-            self::$port = \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter::DEFAULT_PORT;
-        }
+        self::$port = is_numeric($port) ? intval($port) : \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter::DEFAULT_PORT;
+        
         $dbName = getenv('PGSQL_DBNAME', true);
         if (is_string($dbName)) {
             self::$dbName = $dbName;
         } else {
             self::markTestSkipped('Missing environment var PGSQL_DBNAME');
         }
+        
         $username = getenv('PGSQL_USERNAME', true);
         self::$username = is_string($username) ? $username : "";
+        
         $password = getenv('PGSQL_PASSWORD', true);
         self::$password = is_string($password) ? $password : "";
+        
         self::$upgradeSchemaPath = tempnam(sys_get_temp_dir(), 'sql');
         $upgradeSchema = '
             <?php
@@ -63,8 +69,7 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
                     )
                 );
         ';
-        if (empty(self::$host) || empty(self::$dbName) || empty(self::$username)) {
-        } else {
+        if (!(!isset(self::$host) || (self::$host === '' || self::$host === '0') || (!isset(self::$dbName) || (self::$dbName === '' || self::$dbName === '0')) || (self::$username === '' || self::$username === '0'))) {
             file_put_contents(self::$upgradeSchemaPath, trim($upgradeSchema));
             // main object
             self::$db = new \aportela\DatabaseWrapper\DB(
@@ -81,9 +86,9 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
      * Initialize the test case
      * Called for every defined test
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
-        if (empty(self::$host) || empty(self::$dbName) || empty(self::$username)) {
+        if (!isset(self::$host) || (self::$host === '' || self::$host === '0') || (!isset(self::$dbName) || (self::$dbName === '' || self::$dbName === '0')) || (self::$username === '' || self::$username === '0')) {
             $this->markTestSkipped("PGSQL_HOST,PGSQL_DBNAME,PGSQL_USERNAME,PGSQL_PASSWORD environment variables NOT FOUND");
         } else {
             parent::setUp();
@@ -133,8 +138,8 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
     {
         try {
             $this->assertTrue(self::$db->execute(' INSERT INTO "TABLEV2" (id) VALUES(:id)', [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 1)]));
-        } catch (\Throwable $e) {
-            print_r($e);
+        } catch (\Throwable $throwable) {
+            print_r($throwable);
             exit;
         }
     }
@@ -165,6 +170,7 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
                         $item->id = intval($item->id);
                         $item->negativeId = $item->id * -1;
                     }
+                    
                     return ($item);
                 },
                 $rows

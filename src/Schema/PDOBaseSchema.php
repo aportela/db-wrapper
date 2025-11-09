@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace aportela\DatabaseWrapper\Schema;
 
 abstract class PDOBaseSchema implements InterfaceSchema
@@ -34,7 +36,7 @@ abstract class PDOBaseSchema implements InterfaceSchema
      */
     public function getUpgradeQueries(): array
     {
-        if (!empty($this->upgradeSchemaPath)) {
+        if ($this->upgradeSchemaPath !== '' && $this->upgradeSchemaPath !== '0') {
             if (file_exists($this->upgradeSchemaPath)) {
                 $queries = include $this->upgradeSchemaPath;
                 if (is_array($queries)) {

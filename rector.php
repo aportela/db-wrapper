@@ -8,5 +8,13 @@ return RectorConfig::configure()
     ->withPaths([
         __DIR__ . '/src',
     ])
-    // uncomment to reach your current PHP version
-    ->withPhpSets(php84: true);
+    ->withPhpSets(php84: true)
+    ->withPreparedSets(
+        deadCode: true,
+        codeQuality: true,
+        codingStyle: true,
+        naming: true,
+        privatization: true,
+        typeDeclarations: true,
+        rectorPreset: true,
+    );

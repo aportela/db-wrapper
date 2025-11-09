@@ -9,9 +9,10 @@ require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SE
 #[\PHPUnit\Framework\Attributes\RequiresPhpExtension('pdo_sqlite')]
 final class SQLiteTest extends \PHPUnit\Framework\TestCase
 {
-    protected static \aportela\DatabaseWrapper\DB $db;
+    private static \aportela\DatabaseWrapper\DB $db;
 
     private static string $databasePath;
+    
     private static string $upgradeSchemaPath;
 
     public static function setUpBeforeClass(): void
@@ -54,7 +55,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
      * Initialize the test case
      * Called for every defined test
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
     }
@@ -132,6 +133,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
                         $item->id = intval($item->id);
                         $item->negativeId = $item->id * -1;
                     }
+                    
                     return ($item);
                 },
                 $rows

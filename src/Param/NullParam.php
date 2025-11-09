@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace aportela\DatabaseWrapper\Param;
 
 final readonly class NullParam implements InterfaceParam

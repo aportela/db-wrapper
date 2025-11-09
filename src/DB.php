@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace aportela\DatabaseWrapper;
 
 final class DB
 {
-    public function __construct(protected ?\aportela\DatabaseWrapper\Adapter\InterfaceAdapter $adapter, protected \Psr\Log\LoggerInterface $logger)
+    public function __construct(private ?\aportela\DatabaseWrapper\Adapter\InterfaceAdapter $interfaceAdapter, private readonly \Psr\Log\LoggerInterface $logger)
     {
         $this->logger->debug("DatabaseWrapper::__construct");
     }
@@ -18,14 +20,15 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::inTransaction");
         $activeTransaction = false;
-        if ($this->adapter !== null) {
+        if ($this->interfaceAdapter !== null) {
             try {
-                $activeTransaction = $this->adapter->inTransaction();
+                $activeTransaction = $this->interfaceAdapter->inTransaction();
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                 $this->logger->error("DatabaseWrapper::inTransaction FAILED");
                 throw $e;
             }
         }
+        
         return ($activeTransaction);
     }
 
@@ -33,14 +36,15 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::beginTransaction");
         $success = false;
-        if ($this->adapter !== null) {
+        if ($this->interfaceAdapter !== null) {
             try {
-                $success = $this->adapter->beginTransaction();
+                $success = $this->interfaceAdapter->beginTransaction();
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                 $this->logger->error("DatabaseWrapper::beginTransaction FAILED");
                 throw $e;
             }
         }
+        
         return ($success);
     }
 
@@ -48,14 +52,15 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::commit");
         $success = false;
-        if ($this->adapter !== null) {
+        if ($this->interfaceAdapter !== null) {
             try {
-                $success = $this->adapter->commit();
+                $success = $this->interfaceAdapter->commit();
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                 $this->logger->error("DatabaseWrapper::commit FAILED");
                 throw $e;
             }
         }
+        
         return ($success);
     }
 
@@ -63,21 +68,22 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::rollBack");
         $success = false;
-        if ($this->adapter !== null) {
+        if ($this->interfaceAdapter !== null) {
             try {
-                $success = $this->adapter->rollBack();
+                $success = $this->interfaceAdapter->rollBack();
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                 $this->logger->error("DatabaseWrapper::rollBack FAILED");
                 throw $e;
             }
         }
+        
         return ($success);
     }
 
     /**
      * @param array<\aportela\DatabaseWrapper\Param\InterfaceParam> $params
      */
-    private function parseQuery(string $query, $params = []): string
+    private function parseQuery(string $query, array $params = []): string
     {
         foreach ($params as $param) {
             if ($param::class == "aportela\DatabaseWrapper\Param\StringParam") {
@@ -86,6 +92,7 @@ final class DB
                 $query = str_replace($param->getName(), $param->getValue() ?? "", $query);
             }
         }
+        
         $expression = '/[\r\n\t]/';
         $query = preg_replace($expression, " ", $query);
         $expression = '/\s+/';
@@ -96,15 +103,16 @@ final class DB
     public function exec(string $query): int|false
     {
         $this->logger->debug("DatabaseWrapper::exec", ["SQL" => $this->parseQuery($query)]);
-        if ($this->adapter !== null) {
+        if ($this->interfaceAdapter !== null) {
             $rowCount = 0;
             try {
-                $rowCount = $this->adapter->exec($query);
+                $rowCount = $this->interfaceAdapter->exec($query);
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                 $previousException = $e->getPrevious();
-                $this->logger->error("DatabaseWrapper::exec FAILED", ["ERROR" => $previousException !== null ? $previousException->getMessage() : $e->getMessage()]);
+                $this->logger->error("DatabaseWrapper::exec FAILED", ["ERROR" => $previousException instanceof \Throwable ? $previousException->getMessage() : $e->getMessage()]);
                 throw $e;
             }
+            
             return ($rowCount);
         } else {
             return (false);
@@ -118,15 +126,16 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::execute", ["SQL" => $this->parseQuery($query, $params)]);
         $success = false;
-        if ($this->adapter !== null) {
+        if ($this->interfaceAdapter !== null) {
             try {
-                $success = $this->adapter->execute($query, $params);
+                $success = $this->interfaceAdapter->execute($query, $params);
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                 $previousException = $e->getPrevious();
-                $this->logger->error("DatabaseWrapper::execute FAILED", ["ERROR" => $previousException !== null ? $previousException->getMessage() : $e->getMessage()]);
+                $this->logger->error("DatabaseWrapper::execute FAILED", ["ERROR" => $previousException instanceof \Throwable ? $previousException->getMessage() : $e->getMessage()]);
                 throw $e;
             }
         }
+        
         return ($success);
     }
 
@@ -139,34 +148,35 @@ final class DB
         $this->logger->debug("DatabaseWrapper::query", ["SQL" => $this->parseQuery($query, $params)]);
         $rows = [];
         // TODO: change return types to array|false ?
-        if ($this->adapter !== null) {
+        if ($this->interfaceAdapter !== null) {
             try {
-                $rows = $this->adapter->query($query, $params);
+                $rows = $this->interfaceAdapter->query($query, $params);
                 if ($afterQueryFunction != null) {
                     call_user_func($afterQueryFunction, $rows);
                 }
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                 $previousException = $e->getPrevious();
-                $this->logger->error("DatabaseWrapper::query FAILED", ["ERROR" => $previousException !== null ? $previousException->getMessage() : $e->getMessage()]);
+                $this->logger->error("DatabaseWrapper::query FAILED", ["ERROR" => $previousException instanceof \Throwable ? $previousException->getMessage() : $e->getMessage()]);
                 throw $e;
             }
         }
+        
         return ($rows);
     }
 
     public function close(): void
     {
-        if ($this->adapter !== null) {
-            $this->adapter->close();
-            $this->adapter = null;
+        if ($this->interfaceAdapter !== null) {
+            $this->interfaceAdapter->close();
+            $this->interfaceAdapter = null;
         }
     }
 
     public function isSchemaInstalled(): bool
     {
         $this->logger->info("DatabaseWrapper::isSchemaInstalled");
-        if ($this->adapter !== null) {
-            return ($this->adapter->isSchemaInstalled());
+        if ($this->interfaceAdapter !== null) {
+            return ($this->interfaceAdapter->isSchemaInstalled());
         } else {
             return (false);
         }
@@ -180,35 +190,40 @@ final class DB
         // Some databases, including MySQL, automatically issue an implicit COMMIT when a database definition language (DDL) statement such as DROP TABLE or CREATE TABLE is issued within a transaction.
         // The implicit COMMIT will prevent you from rolling back any other changes within the transaction boundary.
         $success = false;
-        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
+        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
             $success = $this->beginTransaction();
-        } elseif ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter) {
+        } elseif ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter) {
             $success = true;
         } else {
             throw new \aportela\DatabaseWrapper\Exception\DBException("DB::isSchemaInstalled FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_ADAPTER->value);
         }
+        
         if ($success) {
             $installed = false;
             try {
-                foreach ($this->adapter->getSchema()->getInstallQueries() as $query) {
+                foreach ($this->interfaceAdapter->getSchema()->getInstallQueries() as $query) {
                     $this->exec($query);
                 }
+                
                 $installed = true;
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                 $this->logger->error("DatabaseWrapper::installSchema", [$e->getMessage()]);
             } finally {
                 if ($installed) {
-                    if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
+                    if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                         $this->commit();
                     }
+                    
                     $this->logger->info("DatabaseWrapper::installSchema SUCCESS");
                 } else {
-                    if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
+                    if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                         $this->rollback();
                     }
+                    
                     $this->logger->emergency("DatabaseWrapper::installSchema FAILED");
                 }
             }
+            
             return ($installed);
         } else {
             $this->logger->emergency("DatabaseWrapper::installSchema FAILED (ERROR OPENING TRANSACTION)");
@@ -219,8 +234,8 @@ final class DB
     public function getCurrentSchemaVersion(): int
     {
         $this->logger->info("DatabaseWrapper::getCurrentSchemaVersion");
-        $results = $this->query($this->adapter->getSchema()->getLastVersionQuery());
-        if (count($results) == 1 && isset($results[0]->release_number)) {
+        $results = $this->query($this->interfaceAdapter->getSchema()->getLastVersionQuery());
+        if (count($results) === 1 && isset($results[0]->release_number)) {
             return ($results[0]->release_number);
         } else {
             return (-1);
@@ -231,45 +246,49 @@ final class DB
     {
         $this->logger->info("DatabaseWrapper::getUpgradeSchemaVersion");
         $lastVersion = -1;
-        foreach ($this->adapter->getSchema()->getUpgradeQueries() as $version => $queries) {
+        foreach ($this->interfaceAdapter->getSchema()->getUpgradeQueries() as $version => $upgradeQuery) {
             if ($version > $lastVersion) {
                 $lastVersion = $version;
             }
         }
+        
         return ($lastVersion);
     }
 
     public function upgradeSchema(bool $backup = true): int
     {
         $this->logger->info("DatabaseWrapper::upgradeSchema");
-        $results = $this->query($this->adapter->getSchema()->getLastVersionQuery());
-        if (count($results) == 1) {
-            if ($backup && $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
-                $this->adapter->backup("");
+        $results = $this->query($this->interfaceAdapter->getSchema()->getLastVersionQuery());
+        if (count($results) === 1) {
+            if ($backup && $this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+                $this->interfaceAdapter->backup("");
             }
+            
             // allow transactions only for sqlite adapters
             // FROM php documentation:
             // Some databases, including MySQL, automatically issue an implicit COMMIT when a database definition language (DDL) statement such as DROP TABLE or CREATE TABLE is issued within a transaction.
             // The implicit COMMIT will prevent you from rolling back any other changes within the transaction boundary.
             $success = false;
-            if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
+            if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                 $success = $this->beginTransaction();
-            } elseif ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter) {
+            } elseif ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter) {
                 $success = true;
             } else {
                 throw new \aportela\DatabaseWrapper\Exception\DBException("DB::isSchemaInstalled FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_ADAPTER->value);
             }
+            
             if ($success && isset($results[0]->release_number)) {
                 $success = false;
                 $currentVersion = $results[0]->release_number;
                 try {
-                    foreach ($this->adapter->getSchema()->getUpgradeQueries() as $version => $queries) {
+                    foreach ($this->interfaceAdapter->getSchema()->getUpgradeQueries() as $version => $queries) {
                         if ($version > $currentVersion) {
                             foreach ($queries as $query) {
                                 $this->exec($query);
                             }
+                            
                             $this->execute(
-                                $this->adapter->getSchema()->getSetVersionQuery(),
+                                $this->interfaceAdapter->getSchema()->getSetVersionQuery(),
                                 [
                                     new \aportela\DatabaseWrapper\Param\IntegerParam(":release_number", $version)
                                 ]
@@ -278,22 +297,26 @@ final class DB
                             $this->logger->info("DatabaseWrapper::upgradeSchema version upgraded to " . $currentVersion);
                         }
                     }
+                    
                     $success = true;
                 } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
                     throw $e;
                 } finally {
                     if ($success) {
-                        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
+                        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                             $this->commit();
                         }
+                        
                         $this->logger->info("DatabaseWrapper::upgradeSchema SUCCESS");
                     } else {
-                        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
+                        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter || $this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter) {
                             $this->rollback();
                         }
+                        
                         $this->logger->emergency("DatabaseWrapper::upgradeSchema FAILED");
                     }
                 }
+                
                 return ($currentVersion);
             } else {
                 $this->logger->emergency("DatabaseWrapper::upgradeSchema FAILED (ERROR OPENING TRANSACTION)");
@@ -307,8 +330,8 @@ final class DB
 
     public function backup(string $path = ""): string
     {
-        if ($this->adapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
-            return ($this->adapter->backup($path));
+        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter) {
+            return ($this->interfaceAdapter->backup($path));
         } else {
             throw new \aportela\DatabaseWrapper\Exception\DBException("DB::backup FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_ADAPTER->value);
         }
@@ -316,8 +339,8 @@ final class DB
 
     public function getAdapterType(): \aportela\DatabaseWrapper\Adapter\AdapterType
     {
-        if ($this->adapter !== null) {
-            switch ($this->adapter::class) {
+        if ($this->interfaceAdapter !== null) {
+            switch ($this->interfaceAdapter::class) {
                 case "aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter":
                     return \aportela\DatabaseWrapper\Adapter\AdapterType::PDO_MariaDB;
                 case "aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter":
