@@ -94,8 +94,8 @@ final class DB
         $expression = '/[\r\n\t]/';
         $query = preg_replace($expression, " ", $query);
         $expression = '/\s+/';
-        $query = preg_replace($expression, " ", $query);
-        return ($query);
+        $query = preg_replace($expression, " ", strval($query));
+        return (strval($query));
     }
 
     public function exec(string $query): int|false

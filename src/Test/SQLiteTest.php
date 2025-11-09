@@ -128,7 +128,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
         $afterQueryFunction = function ($rows): void {
             array_map(
                 function ($item) {
-                    if (isset($item->id)) {
+                    if (is_object($item) && isset($item->id)) {
                         $item->id = intval($item->id);
                         $item->negativeId = $item->id * -1;
                     }
