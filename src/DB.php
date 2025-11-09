@@ -90,7 +90,7 @@ final class DB
         return ($query);
     }
 
-    public function exec(string $query): int
+    public function exec(string $query): int|false
     {
         $this->logger->debug("DatabaseWrapper::exec", array("SQL" => $this->parseQuery($query)));
         $rowCount = 0;
@@ -199,7 +199,7 @@ final class DB
     {
         $this->logger->info("DatabaseWrapper::getCurrentSchemaVersion");
         $results = $this->query($this->adapter->getSchema()->getLastVersionQuery());
-        if (count($results) == 1) {
+        if (count($results) == 1 && isset($results[0]->release_number)) {
             return ($results[0]->release_number);
         } else {
             return (-1);
@@ -238,7 +238,7 @@ final class DB
             } else {
                 throw new \aportela\DatabaseWrapper\Exception\DBException("DB::isSchemaInstalled FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::INVALID_ADAPTER->value);
             }
-            if ($success) {
+            if ($success && isset($results[0]->release_number)) {
                 $success = false;
                 $currentVersion = $results[0]->release_number;
                 try {
