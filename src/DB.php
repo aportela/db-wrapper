@@ -23,11 +23,13 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::inTransaction");
         $activeTransaction = false;
-        try {
-            $activeTransaction = $this->adapter->inTransaction();
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $this->logger->error("DatabaseWrapper::inTransaction FAILED");
-            throw $e;
+        if ($this->adapter !== null) {
+            try {
+                $activeTransaction = $this->adapter->inTransaction();
+            } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+                $this->logger->error("DatabaseWrapper::inTransaction FAILED");
+                throw $e;
+            }
         }
         return ($activeTransaction);
     }
@@ -36,11 +38,13 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::beginTransaction");
         $success = false;
-        try {
-            $success = $this->adapter->beginTransaction();
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $this->logger->error("DatabaseWrapper::beginTransaction FAILED");
-            throw $e;
+        if ($this->adapter !== null) {
+            try {
+                $success = $this->adapter->beginTransaction();
+            } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+                $this->logger->error("DatabaseWrapper::beginTransaction FAILED");
+                throw $e;
+            }
         }
         return ($success);
     }
@@ -49,11 +53,13 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::commit");
         $success = false;
-        try {
-            $success = $this->adapter->commit();
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $this->logger->error("DatabaseWrapper::commit FAILED");
-            throw $e;
+        if ($this->adapter !== null) {
+            try {
+                $success = $this->adapter->commit();
+            } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+                $this->logger->error("DatabaseWrapper::commit FAILED");
+                throw $e;
+            }
         }
         return ($success);
     }
@@ -62,11 +68,13 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::rollBack");
         $success = false;
-        try {
-            $success = $this->adapter->rollBack();
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $this->logger->error("DatabaseWrapper::rollBack FAILED");
-            throw $e;
+        if ($this->adapter !== null) {
+            try {
+                $success = $this->adapter->rollBack();
+            } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+                $this->logger->error("DatabaseWrapper::rollBack FAILED");
+                throw $e;
+            }
         }
         return ($success);
     }
@@ -93,14 +101,19 @@ final class DB
     public function exec(string $query): int|false
     {
         $this->logger->debug("DatabaseWrapper::exec", array("SQL" => $this->parseQuery($query)));
-        $rowCount = 0;
-        try {
-            $rowCount = $this->adapter->exec($query);
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $this->logger->error("DatabaseWrapper::exec FAILED", array("ERROR" => $e->getPrevious()->getMessage()));
-            throw $e;
+        if ($this->adapter !== null) {
+            $rowCount = 0;
+            try {
+                $rowCount = $this->adapter->exec($query);
+            } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+                $previousException = $e->getPrevious();
+                $this->logger->error("DatabaseWrapper::exec FAILED", array("ERROR" => $previousException !== null ? $previousException->getMessage() : $e->getMessage()));
+                throw $e;
+            }
+            return ($rowCount);
+        } else {
+            return (false);
         }
-        return ($rowCount);
     }
 
     /**
@@ -110,11 +123,14 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::execute", array("SQL" => $this->parseQuery($query, $params)));
         $success = false;
-        try {
-            $success = $this->adapter->execute($query, $params);
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $this->logger->error("DatabaseWrapper::execute FAILED", array("ERROR" => $e->getPrevious()->getMessage()));
-            throw $e;
+        if ($this->adapter !== null) {
+            try {
+                $success = $this->adapter->execute($query, $params);
+            } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+                $previousException = $e->getPrevious();
+                $this->logger->error("DatabaseWrapper::execute FAILED", array("ERROR" => $previousException !== null ? $previousException->getMessage() : $e->getMessage()));
+                throw $e;
+            }
         }
         return ($success);
     }
@@ -127,28 +143,38 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::query", array("SQL" => $this->parseQuery($query, $params)));
         $rows = array();
-        try {
-            $rows = $this->adapter->query($query, $params);
-            if ($afterQueryFunction != null) {
-                call_user_func($afterQueryFunction, $rows);
+        // TODO: change return types to array|false ?
+        if ($this->adapter !== null) {
+            try {
+                $rows = $this->adapter->query($query, $params);
+                if ($afterQueryFunction != null) {
+                    call_user_func($afterQueryFunction, $rows);
+                }
+            } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+                $previousException = $e->getPrevious();
+                $this->logger->error("DatabaseWrapper::query FAILED", array("ERROR" => $previousException !== null ? $previousException->getMessage() : $e->getMessage()));
+                throw $e;
             }
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $this->logger->error("DatabaseWrapper::query FAILED", array($params, "ERROR" => $e->getPrevious()->getMessage()));
-            throw $e;
         }
         return ($rows);
     }
 
     public function close(): void
     {
-        $this->adapter->close();
-        $this->adapter = null;
+        if ($this->adapter !== null) {
+            $this->adapter->close();
+            $this->adapter = null;
+        }
     }
 
     public function isSchemaInstalled(): bool
     {
         $this->logger->info("DatabaseWrapper::isSchemaInstalled");
-        return ($this->adapter->isSchemaInstalled());
+        if ($this->adapter !== null) {
+            return ($this->adapter->isSchemaInstalled());
+        } else {
+            return (false);
+        }
     }
 
     public function installSchema(): bool
