@@ -7,10 +7,10 @@ namespace aportela\DatabaseWrapper\Adapter;
 abstract class PDOBaseAdapter implements InterfaceAdapter
 {
     protected ?\PDO $dbh = null;
-    
-    protected ?\aportela\DatabaseWrapper\Schema\InterfaceSchema $schema = null;
 
-    public function getSchema(): ?\aportela\DatabaseWrapper\Schema\InterfaceSchema
+    protected \aportela\DatabaseWrapper\Schema\InterfaceSchema $schema;
+
+    public function getSchema(): \aportela\DatabaseWrapper\Schema\InterfaceSchema
     {
         return ($this->schema);
     }
@@ -30,7 +30,7 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
                 throw new \aportela\DatabaseWrapper\Exception\DBException("PDOBaseAdapter::beginTransaction FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::BEGIN_TRANSACTION->value, $e);
             }
         }
-        
+
         return ($success);
     }
 
@@ -44,7 +44,7 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
                 throw new \aportela\DatabaseWrapper\Exception\DBException("PDOBaseAdapter::beginTransaction FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::IN_TRANSACTION_CHECK->value, $e);
             }
         }
-        
+
         return ($activeTransaction);
     }
 
@@ -58,7 +58,7 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
                 throw new \aportela\DatabaseWrapper\Exception\DBException("PDOBaseAdapter::commit FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::COMMIT_TRANSACTION->value, $e);
             }
         }
-        
+
         return ($success);
     }
 
@@ -72,7 +72,7 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
                 throw new \aportela\DatabaseWrapper\Exception\DBException("PDOBaseAdapter::rollBack FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::ROLLBACK_TRANSACTION->value, $e);
             }
         }
-        
+
         return ($success);
     }
 
@@ -85,7 +85,7 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
             } catch (\PDOException $e) {
                 throw new \aportela\DatabaseWrapper\Exception\DBException("PDOBaseAdapter::exec FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::EXEC->value, $e);
             }
-            
+
             return ($affectedRows);
         } else {
             return (false);
@@ -121,13 +121,13 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
                         }
                     }
                 }
-                
+
                 $success = $stmt->execute();
             } catch (\PDOException $e) {
                 throw new \aportela\DatabaseWrapper\Exception\DBException("PDOBaseAdapter::execute FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::EXECUTE->value, $e);
             }
         }
-        
+
         return ($success);
     }
 
@@ -162,20 +162,20 @@ abstract class PDOBaseAdapter implements InterfaceAdapter
                         }
                     }
                 }
-                
+
                 $rows = [];
                 if ($stmt->execute()) {
                     while ($row = $stmt->fetchObject()) {
                         $rows[] = $row;
                     }
                 }
-                
+
                 $stmt->closeCursor();
             } catch (\PDOException $e) {
                 throw new \aportela\DatabaseWrapper\Exception\DBException("PDOBaseAdapter::query FAILED", \aportela\DatabaseWrapper\Exception\DBExceptionCode::QUERY->value, $e);
             }
         }
-        
+
         return ($rows);
     }
 
