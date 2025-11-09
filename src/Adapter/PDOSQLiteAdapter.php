@@ -7,7 +7,7 @@ final class PDOSQLiteAdapter extends PDOBaseAdapter
     public const FLAGS_PRAGMA_JOURNAL_WAL = 1;
     public const FLAGS_PRAGMA_FOREIGN_KEYS_ON = 2;
 
-    public ?string $databasePath;
+    public string $databasePath;
 
     public function __construct(string $databasePath, string $upgradeSchemaPath = "", int $flags = 0)
     {
