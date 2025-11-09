@@ -20,7 +20,7 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::inTransaction");
         $activeTransaction = false;
-        if ($this->interfaceAdapter !== null) {
+        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\InterfaceAdapter) {
             try {
                 $activeTransaction = $this->interfaceAdapter->inTransaction();
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
@@ -36,7 +36,7 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::beginTransaction");
         $success = false;
-        if ($this->interfaceAdapter !== null) {
+        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\InterfaceAdapter) {
             try {
                 $success = $this->interfaceAdapter->beginTransaction();
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
@@ -52,7 +52,7 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::commit");
         $success = false;
-        if ($this->interfaceAdapter !== null) {
+        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\InterfaceAdapter) {
             try {
                 $success = $this->interfaceAdapter->commit();
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
@@ -68,7 +68,7 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::rollBack");
         $success = false;
-        if ($this->interfaceAdapter !== null) {
+        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\InterfaceAdapter) {
             try {
                 $success = $this->interfaceAdapter->rollBack();
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
@@ -103,7 +103,7 @@ final class DB
     public function exec(string $query): int|false
     {
         $this->logger->debug("DatabaseWrapper::exec", ["SQL" => $this->parseQuery($query)]);
-        if ($this->interfaceAdapter !== null) {
+        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\InterfaceAdapter) {
             $rowCount = 0;
             try {
                 $rowCount = $this->interfaceAdapter->exec($query);
@@ -126,7 +126,7 @@ final class DB
     {
         $this->logger->debug("DatabaseWrapper::execute", ["SQL" => $this->parseQuery($query, $params)]);
         $success = false;
-        if ($this->interfaceAdapter !== null) {
+        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\InterfaceAdapter) {
             try {
                 $success = $this->interfaceAdapter->execute($query, $params);
             } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
@@ -148,7 +148,7 @@ final class DB
         $this->logger->debug("DatabaseWrapper::query", ["SQL" => $this->parseQuery($query, $params)]);
         $rows = [];
         // TODO: change return types to array|false ?
-        if ($this->interfaceAdapter !== null) {
+        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\InterfaceAdapter) {
             try {
                 $rows = $this->interfaceAdapter->query($query, $params);
                 if ($afterQueryFunction != null) {
@@ -166,7 +166,7 @@ final class DB
 
     public function close(): void
     {
-        if ($this->interfaceAdapter !== null) {
+        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\InterfaceAdapter) {
             $this->interfaceAdapter->close();
             $this->interfaceAdapter = null;
         }
@@ -175,7 +175,7 @@ final class DB
     public function isSchemaInstalled(): bool
     {
         $this->logger->info("DatabaseWrapper::isSchemaInstalled");
-        if ($this->interfaceAdapter !== null) {
+        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\InterfaceAdapter) {
             return ($this->interfaceAdapter->isSchemaInstalled());
         } else {
             return (false);
@@ -246,7 +246,7 @@ final class DB
     {
         $this->logger->info("DatabaseWrapper::getUpgradeSchemaVersion");
         $lastVersion = -1;
-        foreach ($this->interfaceAdapter->getSchema()->getUpgradeQueries() as $version => $upgradeQuery) {
+        foreach (array_keys($this->interfaceAdapter->getSchema()->getUpgradeQueries()) as $version) {
             if ($version > $lastVersion) {
                 $lastVersion = $version;
             }
@@ -339,7 +339,7 @@ final class DB
 
     public function getAdapterType(): \aportela\DatabaseWrapper\Adapter\AdapterType
     {
-        if ($this->interfaceAdapter !== null) {
+        if ($this->interfaceAdapter instanceof \aportela\DatabaseWrapper\Adapter\InterfaceAdapter) {
             switch ($this->interfaceAdapter::class) {
                 case "aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter":
                     return \aportela\DatabaseWrapper\Adapter\AdapterType::PDO_MariaDB;
