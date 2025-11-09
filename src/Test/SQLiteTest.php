@@ -125,7 +125,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
     public function testGetMultipleRowsWithAfterQueryFunction(): void
     {
         $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV1 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]));
-        $afterQueryFunction = function ($rows) {
+        $afterQueryFunction = function ($rows): void {
             array_map(
                 function ($item) {
                     $item->id = intval($item->id);

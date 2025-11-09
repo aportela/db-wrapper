@@ -262,7 +262,7 @@ composer require "aportela/db-wrapper"
         }
 
         // after query custom function example for "parsing" rows
-        $afterQueryFunction = function ($rows) {
+        $afterQueryFunction = function ($rows): void {
             array_map(
                 function ($item) {
                     // duplicate name property into new customField
