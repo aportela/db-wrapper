@@ -2,7 +2,7 @@
 
 namespace aportela\DatabaseWrapper\Schema;
 
-class PDOBaseSchema implements InterfaceSchema
+abstract class PDOBaseSchema implements InterfaceSchema
 {
     protected string $upgradeSchemaPath;
     /**

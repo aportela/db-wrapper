@@ -2,7 +2,7 @@
 
 namespace aportela\DatabaseWrapper\Adapter;
 
-class PDOBaseAdapter implements InterfaceAdapter
+abstract class PDOBaseAdapter implements InterfaceAdapter
 {
     protected ?\PDO $dbh;
     protected ?\aportela\DatabaseWrapper\Schema\InterfaceSchema $schema;
