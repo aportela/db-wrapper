@@ -9,7 +9,7 @@ require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "vendor" . DIRECT
 #[\PHPUnit\Framework\Attributes\RequiresPhpExtension('pdo_sqlite')]
 final class SQLiteTest extends \PHPUnit\Framework\TestCase
 {
-    protected static ?\aportela\DatabaseWrapper\DB $db;
+    protected static \aportela\DatabaseWrapper\DB $db;
 
     private static string $databasePath;
     private static string $upgradeSchemaPath;
