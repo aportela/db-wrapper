@@ -110,7 +110,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
     {
         $rows = self::$db->query(" SELECT id FROM TABLEV1 WHERE id = :id ", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 1)]);
         $this->assertCount(1, $rows);
-        $this->assertEquals(1, $rows[0]->id);
+        $this->assertEquals(1, $rows[0]->id ?? null);
     }
 
     public function testGetMultipleRows(): void
@@ -118,8 +118,8 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV1 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]));
         $rows = self::$db->query(" SELECT id FROM TABLEV1 ", []);
         $this->assertCount(2, $rows);
-        $this->assertEquals(1, $rows[0]->id);
-        $this->assertEquals(2, $rows[1]->id);
+        $this->assertEquals(1, $rows[0]->id ?? null);
+        $this->assertEquals(2, $rows[1]->id ?? null);
     }
 
     public function testGetMultipleRowsWithAfterQueryFunction(): void
@@ -137,12 +137,12 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
         };
         $rows = self::$db->query(" SELECT id FROM TABLEV1 ", [], $afterQueryFunction);
         $this->assertCount(3, $rows);
-        $this->assertEquals(1, $rows[0]->id);
-        $this->assertEquals(2, $rows[1]->id);
-        $this->assertEquals(3, $rows[2]->id);
-        $this->assertEquals(-1, $rows[0]->negativeId);
-        $this->assertEquals(-2, $rows[1]->negativeId);
-        $this->assertEquals(-3, $rows[2]->negativeId);
+        $this->assertEquals(1, $rows[0]->id ?? null);
+        $this->assertEquals(2, $rows[1]->id ?? null);
+        $this->assertEquals(3, $rows[2]->id ?? null);
+        $this->assertEquals(-1, $rows[0]->negativeId ?? null);
+        $this->assertEquals(-2, $rows[1]->negativeId ?? null);
+        $this->assertEquals(-3, $rows[2]->negativeId ?? null);
     }
 
     public function testInTransactionWithTransaction(): void
@@ -171,7 +171,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
             if (self::$db->commit()) {
                 $rows = self::$db->query(" SELECT id FROM TABLEV2 WHERE id = :id ", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 2)]);
                 $this->assertCount(1, $rows);
-                $this->assertEquals(2, $rows[0]->id);
+                $this->assertEquals(2, $rows[0]->id ?? null);
             } else {
                 $this->fail('commit failed');
             }
