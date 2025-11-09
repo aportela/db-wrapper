@@ -12,7 +12,7 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
     private static \aportela\DatabaseWrapper\DB $db;
 
     private static string $databasePath;
-    
+
     private static string $upgradeSchemaPath;
 
     public static function setUpBeforeClass(): void
@@ -129,11 +129,11 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
         $afterQueryFunction = function ($rows): void {
             array_map(
                 function ($item) {
-                    if (is_object($item) && isset($item->id)) {
+                    if (is_object($item) && isset($item->id) && is_numeric($item->id)) {
                         $item->id = intval($item->id);
                         $item->negativeId = $item->id * -1;
                     }
-                    
+
                     return ($item);
                 },
                 $rows

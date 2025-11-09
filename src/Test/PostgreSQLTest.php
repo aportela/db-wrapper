@@ -166,7 +166,7 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
         $afterQueryFunction = function ($rows): void {
             array_map(
                 function ($item) {
-                    if (is_object($item) && isset($item->id)) {
+                    if (is_object($item) && isset($item->id) && is_numeric($item->id)) {
                         $item->id = intval($item->id);
                         $item->negativeId = $item->id * -1;
                     }
