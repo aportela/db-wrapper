@@ -166,17 +166,16 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
         $afterQueryFunction = function ($rows): void {
             array_map(
                 function ($item) {
-                    if (is_object($item) && isset($item->id) && is_numeric($item->id)) {
+                    if (is_object($item) && isset($item->id) && is_numeric($item->id) && isset($item->negativeId)) {
                         $item->id = intval($item->id);
                         $item->negativeId = $item->id * -1;
                     }
-
                     return ($item);
                 },
                 $rows
             );
         };
-        $rows = self::$db->query(" SELECT id FROM TABLEV1 ", [], $afterQueryFunction);
+        $rows = self::$db->query(" SELECT id, id as negativeId FROM TABLEV1 ", [], $afterQueryFunction);
         $this->assertCount(3, $rows);
         $this->assertEquals(1, $rows[0]->id ?? null);
         $this->assertEquals(2, $rows[1]->id ?? null);
