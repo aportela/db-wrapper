@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace aportela\DatabaseWrapper;
 
-final class DB
+final readonly class DB
 {
-    public function __construct(private \aportela\DatabaseWrapper\Adapter\InterfaceAdapter $interfaceAdapter, private readonly \Psr\Log\LoggerInterface $logger)
+    public function __construct(private \aportela\DatabaseWrapper\Adapter\InterfaceAdapter $interfaceAdapter, private \Psr\Log\LoggerInterface $logger)
     {
         $this->logger->debug("DatabaseWrapper::__construct");
     }
@@ -22,10 +22,11 @@ final class DB
         $activeTransaction = false;
         try {
             $activeTransaction = $this->interfaceAdapter->inTransaction();
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+        } catch (\aportela\DatabaseWrapper\Exception\DBException $dBException) {
             $this->logger->error("DatabaseWrapper::inTransaction FAILED");
-            throw $e;
+            throw $dBException;
         }
+
         return ($activeTransaction);
     }
 
@@ -35,10 +36,11 @@ final class DB
         $success = false;
         try {
             $success = $this->interfaceAdapter->beginTransaction();
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+        } catch (\aportela\DatabaseWrapper\Exception\DBException $dBException) {
             $this->logger->error("DatabaseWrapper::beginTransaction FAILED");
-            throw $e;
+            throw $dBException;
         }
+
         return ($success);
     }
 
@@ -48,10 +50,11 @@ final class DB
         $success = false;
         try {
             $success = $this->interfaceAdapter->commit();
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+        } catch (\aportela\DatabaseWrapper\Exception\DBException $dBException) {
             $this->logger->error("DatabaseWrapper::commit FAILED");
-            throw $e;
+            throw $dBException;
         }
+
         return ($success);
     }
 
@@ -61,10 +64,11 @@ final class DB
         $success = false;
         try {
             $success = $this->interfaceAdapter->rollBack();
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
+        } catch (\aportela\DatabaseWrapper\Exception\DBException $dBException) {
             $this->logger->error("DatabaseWrapper::rollBack FAILED");
-            throw $e;
+            throw $dBException;
         }
+
         return ($success);
     }
 
@@ -94,11 +98,12 @@ final class DB
         $rowCount = 0;
         try {
             $rowCount = $this->interfaceAdapter->exec($query);
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $previousException = $e->getPrevious();
-            $this->logger->error("DatabaseWrapper::exec FAILED", ["ERROR" => $previousException instanceof \Throwable ? $previousException->getMessage() : $e->getMessage()]);
-            throw $e;
+        } catch (\aportela\DatabaseWrapper\Exception\DBException $dBException) {
+            $previousException = $dBException->getPrevious();
+            $this->logger->error("DatabaseWrapper::exec FAILED", ["ERROR" => $previousException instanceof \Throwable ? $previousException->getMessage() : $dBException->getMessage()]);
+            throw $dBException;
         }
+
         return ($rowCount);
     }
 
@@ -111,11 +116,12 @@ final class DB
         $success = false;
         try {
             $success = $this->interfaceAdapter->execute($query, $params);
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $previousException = $e->getPrevious();
-            $this->logger->error("DatabaseWrapper::execute FAILED", ["ERROR" => $previousException instanceof \Throwable ? $previousException->getMessage() : $e->getMessage()]);
-            throw $e;
+        } catch (\aportela\DatabaseWrapper\Exception\DBException $dBException) {
+            $previousException = $dBException->getPrevious();
+            $this->logger->error("DatabaseWrapper::execute FAILED", ["ERROR" => $previousException instanceof \Throwable ? $previousException->getMessage() : $dBException->getMessage()]);
+            throw $dBException;
         }
+
         return ($success);
     }
 
@@ -132,11 +138,12 @@ final class DB
             if ($afterQueryFunction != null) {
                 call_user_func($afterQueryFunction, $rows);
             }
-        } catch (\aportela\DatabaseWrapper\Exception\DBException $e) {
-            $previousException = $e->getPrevious();
-            $this->logger->error("DatabaseWrapper::query FAILED", ["ERROR" => $previousException instanceof \Throwable ? $previousException->getMessage() : $e->getMessage()]);
-            throw $e;
+        } catch (\aportela\DatabaseWrapper\Exception\DBException $dBException) {
+            $previousException = $dBException->getPrevious();
+            $this->logger->error("DatabaseWrapper::query FAILED", ["ERROR" => $previousException instanceof \Throwable ? $previousException->getMessage() : $dBException->getMessage()]);
+            throw $dBException;
         }
+
         return ($rows);
     }
 
