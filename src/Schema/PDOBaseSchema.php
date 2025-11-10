@@ -9,9 +9,7 @@ abstract class PDOBaseSchema implements InterfaceSchema
     /**
      * @param array<string> $installQueries
      */
-    public function __construct(protected string $upgradeSchemaPath = "", protected array $installQueries = [], protected string $setCurrentVersionQuery = "", protected string $getCurrentVersionQuery = "")
-    {
-    }
+    public function __construct(protected string $upgradeSchemaPath = "", protected array $installQueries = [], protected string $setCurrentVersionQuery = "", protected string $getCurrentVersionQuery = "") {}
 
     /**
      * @return array<string>
@@ -40,6 +38,9 @@ abstract class PDOBaseSchema implements InterfaceSchema
             if (file_exists($this->upgradeSchemaPath)) {
                 $queries = include $this->upgradeSchemaPath;
                 if (is_array($queries)) {
+                    /**
+                     * @var array<int, array<string>> $queries
+                     */
                     return $queries;
                 } else {
                     throw new \Exception("Invalid schema file (not array) at " . $this->upgradeSchemaPath);

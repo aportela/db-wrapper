@@ -22,7 +22,7 @@ final class StringParam implements InterfaceParam
         return ($this->name);
     }
 
-    public function getValue(): mixed
+    public function getValue(): string
     {
         return ($this->value);
     }

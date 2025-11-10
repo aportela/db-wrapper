@@ -10,5 +10,5 @@ interface InterfaceParam
 
     public function getName(): string;
 
-    public function getValue(): mixed;
+    public function getValue(): bool|float|int|null|string;
 }
