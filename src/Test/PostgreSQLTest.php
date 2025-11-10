@@ -163,13 +163,14 @@ final class PostgreSQLTest extends \PHPUnit\Framework\TestCase
     public function testGetMultipleRowsWithAfterQueryFunction(): void
     {
         $this->assertEquals(1, self::$db->execute(" INSERT INTO TABLEV1 (id) VALUES(:id)", [new \aportela\DatabaseWrapper\Param\IntegerParam(":id", 3)]));
-        $afterQueryFunction = function ($rows): void {
+        $afterQueryFunction = function (array $rows): void {
             array_map(
                 function ($item) {
                     if (is_object($item) && isset($item->id) && is_numeric($item->id) && isset($item->negativeId)) {
                         $item->id = intval($item->id);
                         $item->negativeId = $item->id * -1;
                     }
+
                     return ($item);
                 },
                 $rows
