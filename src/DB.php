@@ -211,8 +211,8 @@ final readonly class DB
     {
         $this->logger->info("DatabaseWrapper::getCurrentSchemaVersion");
         $results = $this->query($this->interfaceAdapter->getSchema()->getLastVersionQuery());
-        if (count($results) === 1 && isset($results[0]->release_number)) {
-            return ($results[0]->release_number);
+        if (count($results) === 1 && isset($results[0]->release_number) && is_numeric($results[0]->release_number)) {
+            return (intval($results[0]->release_number));
         } else {
             return (-1);
         }
@@ -293,7 +293,12 @@ final readonly class DB
                     }
                 }
 
-                return ($currentVersion);
+                if (is_numeric($currentVersion)) {
+                    return (intval($currentVersion));
+                } else {
+                    $this->logger->emergency("DatabaseWrapper::upgradeSchema FAILED (INVALID CURRENT VERSION)");
+                    return (-1);
+                }
             } else {
                 $this->logger->emergency("DatabaseWrapper::upgradeSchema FAILED (ERROR OPENING TRANSACTION)");
                 return (-1);
