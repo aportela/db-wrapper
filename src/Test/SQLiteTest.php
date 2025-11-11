@@ -56,7 +56,6 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
                 ],
                 \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_JOURNAL_WAL | \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_FOREIGN_KEYS_ON,
                 self::$upgradeSchemaPath
-
             ),
             new \Psr\Log\NullLogger()
         );
