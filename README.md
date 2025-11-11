@@ -77,7 +77,20 @@ composer require "aportela/db-wrapper"
 
     // we are using PDO sqlite adapter
     $adapter = new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter(
-        $settings["database"]["path"] . $settings["database"]["filename"]
+        $settings["database"]["path"] . $settings["database"]["filename"],
+        // PDO options
+        [
+            // turn off persistent connections
+            \PDO::ATTR_PERSISTENT => false,
+            // enable exceptions
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            // emulate prepared statements
+            \PDO::ATTR_EMULATE_PREPARES => true,
+            // set default fetch mode to array
+            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+        ],
+        // optional flags, bitmask to set "PRAGMA journal_mode = WAL" && "PRAGMA foreign_keys = ON"
+        \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_JOURNAL_WAL | \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_FOREIGN_KEYS_ON
     );
     /*
     // MariaDB adapter
@@ -86,7 +99,18 @@ composer require "aportela/db-wrapper"
         $settings["database"]["port"],
         $settings["database"]["db"],
         $settings["database"]["username"],
-        $settings["database"]["password"]
+        $settings["database"]["password"],
+        // PDO options
+        [
+            // turn off persistent connections
+            \PDO::ATTR_PERSISTENT => false,
+            // enable exceptions
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            // emulate prepared statements
+            \PDO::ATTR_EMULATE_PREPARES => true,
+            // set default fetch mode to array
+            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+        ]
     );
     // PostgreSQL adapter
     $adapter = new \aportela\DatabaseWrapper\Adapter\PDOPostgreSQLAdapter(
@@ -94,7 +118,18 @@ composer require "aportela/db-wrapper"
         $settings["database"]["port"],
         $settings["database"]["db"],
         $settings["database"]["username"],
-        $settings["database"]["password"]
+        $settings["database"]["password"],
+        // PDO options
+        [
+            // turn off persistent connections
+            \PDO::ATTR_PERSISTENT => false,
+            // enable exceptions
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            // emulate prepared statements
+            \PDO::ATTR_EMULATE_PREPARES => true,
+            // set default fetch mode to array
+            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+        ]
     );
     */
     // main object
