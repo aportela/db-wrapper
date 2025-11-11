@@ -45,6 +45,16 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
             new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter(
                 self::$databasePath,
                 self::$upgradeSchemaPath,
+                [
+                    // Turn off persistent connections
+                    \PDO::ATTR_PERSISTENT => false,
+                    // Enable exceptions
+                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                    // Emulate prepared statements
+                    \PDO::ATTR_EMULATE_PREPARES => true,
+                    // Set default fetch mode to array
+                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                ],
                 \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_JOURNAL_WAL | \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_FOREIGN_KEYS_ON
             ),
             new \Psr\Log\NullLogger()

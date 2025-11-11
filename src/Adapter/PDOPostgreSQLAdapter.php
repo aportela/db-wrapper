@@ -7,15 +7,21 @@ namespace aportela\DatabaseWrapper\Adapter;
 final class PDOPostgreSQLAdapter extends PDOBaseAdapter
 {
     public const int DEFAULT_PORT = 5432;
-    
+
     public ?string $dbName;
 
-    public function __construct(string $host, int $port, string $dbName, string $username, string $password, string $upgradeSchemaPath = "")
+    /**
+     * @param array<int, bool|int> $options
+     */
+    public function __construct(string $host, int $port, string $dbName, string $username, string $password, array $options = [], string $upgradeSchemaPath = "")
     {
         try {
             $this->dbName = $dbName;
             $this->dbh = new \PDO(
-                sprintf("pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s", $host, $port, $dbName, $username, $password)
+                sprintf("pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s", $host, $port, $dbName, $username, $password),
+                null,
+                null,
+                $options
             );
             $this->schema = new \aportela\DatabaseWrapper\Schema\PDOPostgreSQLSchema(
                 $upgradeSchemaPath,

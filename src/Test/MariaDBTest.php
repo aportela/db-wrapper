@@ -73,7 +73,24 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
             file_put_contents(self::$upgradeSchemaPath, trim($upgradeSchema));
             // main object
             self::$db = new \aportela\DatabaseWrapper\DB(
-                new \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter(self::$host, self::$port, self::$dbName, self::$username, self::$password, self::$upgradeSchemaPath),
+                new \aportela\DatabaseWrapper\Adapter\PDOMariaDBAdapter(
+                    self::$host,
+                    self::$port,
+                    self::$dbName,
+                    self::$username,
+                    self::$password,
+                    [
+                        // Turn off persistent connections
+                        \PDO::ATTR_PERSISTENT => false,
+                        // Enable exceptions
+                        \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                        // Emulate prepared statements
+                        \PDO::ATTR_EMULATE_PREPARES => true,
+                        // Set default fetch mode to array
+                        \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                    ],
+                    self::$upgradeSchemaPath
+                ),
                 new \Psr\Log\NullLogger()
             );
             self::$db->execute(" DROP TABLE IF EXISTS `VERSION`; ");
@@ -165,7 +182,7 @@ final class MariaDBTest extends \PHPUnit\Framework\TestCase
                         $item->id = intval($item->id);
                         $item->negativeId = $item->id * -1;
                     }
-                    
+
                     return ($item);
                 },
                 $rows

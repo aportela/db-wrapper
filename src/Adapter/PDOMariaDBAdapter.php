@@ -7,10 +7,13 @@ namespace aportela\DatabaseWrapper\Adapter;
 final class PDOMariaDBAdapter extends PDOBaseAdapter
 {
     public const int DEFAULT_PORT = 3306;
-    
+
     public ?string $dbName;
 
-    public function __construct(string $host, int $port, string $dbName, string $username, string $password, string $upgradeSchemaPath = "")
+    /**
+     * @param array<int, bool|int> $options
+     */
+    public function __construct(string $host, int $port, string $dbName, string $username, string $password, array $options = [], string $upgradeSchemaPath = "")
     {
         try {
             $this->dbName = $dbName;
@@ -18,9 +21,7 @@ final class PDOMariaDBAdapter extends PDOBaseAdapter
                 sprintf("mysql:host=%s;port=%d;dbname=%s", $host, $port, $dbName),
                 $username,
                 $password,
-                [
-                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
-                ]
+                $options
             );
             $this->schema = new \aportela\DatabaseWrapper\Schema\PDOMariaDBSchema(
                 $upgradeSchemaPath,

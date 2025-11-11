@@ -206,7 +206,18 @@ composer require "aportela/db-wrapper"
         $settings["database"]["path"] . $settings["database"]["filename"],
         // READ upgrade SQL schema file definition on next block of this README.md
         $settings["database"]["upgradeSchemaPath"],
-        // optional param, bitmask to set "PRAGMA journal_mode = WAL" && "PRAGMA foreign_keys = ON"
+        // PDO options
+        [
+            // turn off persistent connections
+            \PDO::ATTR_PERSISTENT => false,
+            // enable exceptions
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            // emulate prepared statements
+            \PDO::ATTR_EMULATE_PREPARES => true,
+            // set default fetch mode to array
+            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+        ],
+        // optional flags, bitmask to set "PRAGMA journal_mode = WAL" && "PRAGMA foreign_keys = ON"
         \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_JOURNAL_WAL | \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_FOREIGN_KEYS_ON
     );
 
@@ -218,6 +229,17 @@ composer require "aportela/db-wrapper"
         $settings["database"]["db"],
         $settings["database"]["username"],
         $settings["database"]["password"],
+        // PDO options
+        [
+            // turn off persistent connections
+            \PDO::ATTR_PERSISTENT => false,
+            // enable exceptions
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            // emulate prepared statements
+            \PDO::ATTR_EMULATE_PREPARES => true,
+            // set default fetch mode to array
+            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+        ],
         $settings["database"]["upgradeSchemaPath"]
     );
     // PostgreSQL adapter
@@ -227,6 +249,17 @@ composer require "aportela/db-wrapper"
         $settings["database"]["db"],
         $settings["database"]["username"],
         $settings["database"]["password"],
+        // PDO options
+        [
+            // turn off persistent connections
+            \PDO::ATTR_PERSISTENT => false,
+            // enable exceptions
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            // emulate prepared statements
+            \PDO::ATTR_EMULATE_PREPARES => true,
+            // set default fetch mode to array
+            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+        ],
         $settings["database"]["upgradeSchemaPath"]
     );
     */
