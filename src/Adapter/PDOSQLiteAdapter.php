@@ -15,7 +15,7 @@ final class PDOSQLiteAdapter extends PDOBaseAdapter
     /**
      * @param array<int, bool|int> $options
      */
-    public function __construct(string $databasePath, string $upgradeSchemaPath = "", array $options = [], int $flags = 0)
+    public function __construct(string $databasePath, array $options = [], int $flags = 0, string $upgradeSchemaPath = "")
     {
         try {
             $this->databasePath = $databasePath;

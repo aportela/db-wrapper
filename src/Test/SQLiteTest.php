@@ -44,7 +44,6 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
         self::$db = new \aportela\DatabaseWrapper\DB(
             new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter(
                 self::$databasePath,
-                self::$upgradeSchemaPath,
                 [
                     // Turn off persistent connections
                     \PDO::ATTR_PERSISTENT => false,
@@ -55,7 +54,9 @@ final class SQLiteTest extends \PHPUnit\Framework\TestCase
                     // Set default fetch mode to array
                     \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
                 ],
-                \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_JOURNAL_WAL | \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_FOREIGN_KEYS_ON
+                \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_JOURNAL_WAL | \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_FOREIGN_KEYS_ON,
+                self::$upgradeSchemaPath
+
             ),
             new \Psr\Log\NullLogger()
         );

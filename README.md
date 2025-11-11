@@ -204,8 +204,6 @@ composer require "aportela/db-wrapper"
     // we are using PDO sqlite adapter, also set the upgrade scheme (point to a local file)
     $adapter = new \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter(
         $settings["database"]["path"] . $settings["database"]["filename"],
-        // READ upgrade SQL schema file definition on next block of this README.md
-        $settings["database"]["upgradeSchemaPath"],
         // PDO options
         [
             // turn off persistent connections
@@ -218,7 +216,9 @@ composer require "aportela/db-wrapper"
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
         ],
         // optional flags, bitmask to set "PRAGMA journal_mode = WAL" && "PRAGMA foreign_keys = ON"
-        \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_JOURNAL_WAL | \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_FOREIGN_KEYS_ON
+        \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_JOURNAL_WAL | \aportela\DatabaseWrapper\Adapter\PDOSQLiteAdapter::FLAGS_PRAGMA_FOREIGN_KEYS_ON,
+        // READ upgrade SQL schema file definition on next block of this README.md
+        $settings["database"]["upgradeSchemaPath"]
     );
 
     /*
