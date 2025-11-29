@@ -16,7 +16,7 @@ final class PDOSQLiteSchema extends PDOBaseSchema
         ',
         '
             INSERT INTO "VERSION" (release_number, release_date) VALUES (0, datetime());
-        '
+        ',
     ];
 
     public const string SET_CURRENT_VERSION_QUERY = ' INSERT INTO "VERSION" (release_number, release_date) VALUES (:release_number, datetime()); ';

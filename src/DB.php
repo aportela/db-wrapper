@@ -266,7 +266,7 @@ final readonly class DB
                             $this->execute(
                                 $this->interfaceAdapter->getSchema()->getSetVersionQuery(),
                                 [
-                                    new \aportela\DatabaseWrapper\Param\IntegerParam(":release_number", $version)
+                                    new \aportela\DatabaseWrapper\Param\IntegerParam(":release_number", $version),
                                 ]
                             );
                             $currentVersion = $version;

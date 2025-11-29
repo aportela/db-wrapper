@@ -9,9 +9,7 @@ abstract class PDOBaseSchema implements InterfaceSchema
     /**
      * @param array<string> $installQueries
      */
-    public function __construct(protected string $upgradeSchemaPath = "", protected array $installQueries = [], protected string $setCurrentVersionQuery = "", protected string $getCurrentVersionQuery = "")
-    {
-    }
+    public function __construct(protected string $upgradeSchemaPath = "", protected array $installQueries = [], protected string $setCurrentVersionQuery = "", protected string $getCurrentVersionQuery = "") {}
 
     /**
      * @return array<string>
